@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { excelTranslatorDataConnect } from '../../data_connect/excelTranslatorDataConnect';
 import ExcelTranslatorControlBar from './ExcelTranslatorControlBar';
+import ExcelTranslatorDownloadExcelDataBoard from './ExcelTranslatorDownloadExcelDataBoard';
 import ExcelTranslatorDownloadDataBoard from './ExcelTranslatorDownloadExcelDataBoard';
 import ExcelTranslatorUploadDataBoard from './ExcelTranslatorUploadDataBoard';
 
@@ -25,6 +26,7 @@ class TranslatedData {
 const ExcelTranslatorMain = () => {
     const [excelTranslatorHeaderList, setExcelTranslatorHeaderList] = useState([]);
     const [uploadedExcelData, setUploadedExcelData] = useState(null);
+    const [selectedHeaderTitle, setSelectedHeaderTitle] = useState(null);
 
     useEffect(() => {
         async function fetchInit() {
@@ -72,6 +74,30 @@ const ExcelTranslatorMain = () => {
                         let res = err.response;
                         alert(res?.data?.message);
                     })
+            },
+            createUploadHeaderDetails: async function (uploadHeaderDetails) {
+                await excelTranslatorDataConnect().createUploadHeaderDetail(uploadHeaderDetails)
+                    .then(res => {
+                        if (res.status === 200 && res.data && res.data.message === 'success') {
+                            alert('저장되었습니다.');
+                        }
+                    })
+                    .catch(err => {
+                        let res = err.response;
+                        alert(res?.data?.message);
+                    })
+            },
+            createDownloadHeaderDetails: async function (downloadHeaderDetails) {
+                await excelTranslatorDataConnect().createDownloadHeaderDetails(downloadHeaderDetails)
+                    .then(res => {
+                        if (res.status === 200 && res.data && res.data.message === 'success') {
+                            alert('저장되었습니다.');
+                        }
+                    })
+                    .catch(err => {
+                        let res = err.response;
+                        alert(res?.data?.message);
+                    })
             }
         }
     }
@@ -82,6 +108,9 @@ const ExcelTranslatorMain = () => {
                 return {
                     submit: async function (headerTitle) {
                         await __handleDataConnect().createTranslatorHeaderTitle(headerTitle);
+                    },
+                    changeSelectedHeaderTitle: function (headerTitle) {
+                        setSelectedHeaderTitle(headerTitle);
                     }
                 }
             },
@@ -133,6 +162,20 @@ const ExcelTranslatorMain = () => {
                         await __handleDataConnect().downloadTranslatedExcelFile(translatedDetail);
                     }
                 }
+            },
+            createUploadHeaderDetails: function () {
+                return {
+                    submit: async function (uploadHeaderDetails) {
+                        await __handleDataConnect().createUploadHeaderDetails(uploadHeaderDetails);
+                    }
+                }
+            },
+            createDownloadHeaderDetails: function () {
+                return {
+                    submit: async function (downloadHeaderDetails) {
+                        await __handleDataConnect().createDownloadHeaderDetails(downloadHeaderDetails);
+                    }
+                }
             }
         }
     }
@@ -147,17 +190,23 @@ const ExcelTranslatorMain = () => {
                 uploadExcelFileControl={(uploadedFormData) => __handleEventControl().uploadExcelData().submit(uploadedFormData)}
                 downloadTranslatedExcelFileControl={(downloadHeaderDetail) => __handleEventControl().downloadTranslatedExcelFile().submit(downloadHeaderDetail)}
                 resetUploadExcelFileControl={() => __handleEventControl().uploadExcelData().reset()}
+                changeSelectedHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().changeSelectedHeaderTitle(headerTitle)}
             ></ExcelTranslatorControlBar>
 
             {/* 업로드 헤더 및 데이터 보드 */}
             <ExcelTranslatorUploadDataBoard
-                
+                uploadedExcelData={uploadedExcelData}
+                selectedHeaderTitle={selectedHeaderTitle}
+
+                createUploadHeaderDetailsControl={(uploadDetails) => __handleEventControl().createUploadHeaderDetails().submit(uploadDetails)}
             ></ExcelTranslatorUploadDataBoard>
 
             {/* 다운로드 헤더 보드 */}
-            <ExcelTranslatorDownloadDataBoard
-            
-            ></ExcelTranslatorDownloadDataBoard>
+            <ExcelTranslatorDownloadExcelDataBoard
+                selectedHeaderTitle={selectedHeaderTitle}
+
+                createDownloadHeaderDetailsControl={(downloadDetails) => __handleEventControl().createDownloadHeaderDetails().submit(downloadDetails)}
+            ></ExcelTranslatorDownloadExcelDataBoard>
         </>
     )
 }

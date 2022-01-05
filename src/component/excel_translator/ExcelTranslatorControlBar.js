@@ -220,7 +220,10 @@ const ExcelTranslatorControlBar = (props) => {
 
                 // uploadedExcelData를 null로 변경
                 props.resetUploadExcelFileControl();
-                setSelectedHeaderTitle(props.excelTranslatorHeaderList.filter(r => r.id === selectedTitle.id)[0]);
+
+                let selectedHeader = props.excelTranslatorHeaderList.filter(r => r.id === selectedTitle.id)[0];
+                setSelectedHeaderTitle(selectedHeader);
+                props.changeSelectedHeaderTitleControl(selectedHeader);
             },
         }
     }
