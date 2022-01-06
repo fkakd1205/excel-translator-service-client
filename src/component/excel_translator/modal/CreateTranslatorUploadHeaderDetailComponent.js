@@ -16,15 +16,11 @@ const ItemWrapper = styled.div`
 
 const ItemHeaderWrapper = styled.div`
     border-bottom: 1px solid #5961c788;
+    align-items: center;
     padding:10px;
     overflow: auto;
     display: grid;
     grid-template-columns: 6fr 1fr;
-    
-    & .ref-stock-btn-active {
-        background-color: #4682B4;
-        color: white;
-    }
 `;
 
 const GroupTitle = styled.div`
@@ -56,19 +52,37 @@ const BodyContainer = styled.div`
     overflow: auto;
 `;
 
-const SubmitBtn = styled.button`
-    border: none;
-    border-radius: 50%;
-    background-color: #c7cee3ee;
-    margin: 10px;
-`;
-
 const HeaderInfo = styled.div`
     display: grid;
     grid-template-columns: 1fr;
     padding: 3px 10px;
     text-align: center;
     align-items: center;
+`;
+
+const CreateBtn = styled.button`
+    background: #aab3cdee;
+    border:none;
+    margin: 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: 0.4s;
+
+    & .button-img{
+        width:32px;
+        filter: invert(100%) sepia(1%) saturate(3%) hue-rotate(90deg) brightness(113%) contrast(89%);
+    }
+
+    &:hover{
+        transform: scale(1.1);
+    }
+
+    &:active{
+        transition: 0s;
+        transform: scale(1.05);
+        background: #c7cee3ee;
+    }
 `;
 
 const CreateTranslatorUploadHeaderDetailComponent = (props) => {
@@ -80,7 +94,7 @@ const CreateTranslatorUploadHeaderDetailComponent = (props) => {
                         <ItemWrapper>
                             <ItemHeaderWrapper>
                                 <GroupTitle>엑셀 양식 저장</GroupTitle>
-                                <SubmitBtn type='submit'><AddTaskIcon /></SubmitBtn>
+                                <CreateBtn type='submit'><AddTaskIcon /></CreateBtn>
                             </ItemHeaderWrapper>
                         </ItemWrapper>
                     </ItemContainer>

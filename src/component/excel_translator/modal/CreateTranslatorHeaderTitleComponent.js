@@ -3,7 +3,16 @@ import styled from "styled-components";
 import AddTaskIcon from '@mui/icons-material/AddTask';
 
 const Container = styled.div`
-
+    .icon-must {
+        position: relative;
+        margin-left: 5px;
+        width: 6px;
+        height: 6px;
+        display: inline-block;
+        background-color: #ff545c;
+        border-radius: 50%;
+        vertical-align: middle;
+    }
 `;
 
 const ItemContainer = styled.div`
@@ -17,6 +26,7 @@ const ItemWrapper = styled.div`
 const ItemHeaderWrapper = styled.div`
     border-bottom: 1px solid #5961c788;
     padding:10px;
+    align-items: center;
     overflow: auto;
     display: grid;
     grid-template-columns: 6fr 1fr;
@@ -43,12 +53,13 @@ const DataTitle = styled.div`
 const BodyContainer = styled.div`
     padding: 20px;
     background-color: rgb(232 236 247);
+    padding-bottom: 50px;
 `;
 
 const CommonInputEl = styled.input`
     font-size: 1.1rem;
     border: none;
-    width: 100%;
+    /* width: 100%; */
     padding: 10px;
     border-bottom: 1px solid #ced4da;
     &:focus{
@@ -66,6 +77,7 @@ const SubmitBtn = styled.button`
 
     &:hover{
         transform: scale(1.1);
+        cursor: pointer;
     }
 
     &:active{
@@ -78,8 +90,34 @@ const SubmitBtn = styled.button`
 
 const HeaderInfo = styled.div`
     display: grid;
-    grid-template-columns: 40% 50%;
-    padding: 5px;
+    grid-template-columns: 90%;
+    place-content: center;
+`;
+
+
+const CreateBtn = styled.button`
+    background: #aab3cdee;
+    border:none;
+    margin: 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: 0.4s;
+
+    & .button-img{
+        width:32px;
+        filter: invert(100%) sepia(1%) saturate(3%) hue-rotate(90deg) brightness(113%) contrast(89%);
+    }
+
+    &:hover{
+        transform: scale(1.1);
+    }
+    
+    &:active{
+        transition: 0s;
+        transform: scale(1.05);
+        background: #c7cee3ee;
+    }
 `;
 
 const CreateTranslatorHeaderTitleComponent = (props) => {
@@ -91,13 +129,13 @@ const CreateTranslatorHeaderTitleComponent = (props) => {
                         <ItemWrapper>
                             <ItemHeaderWrapper>
                                 <GroupTitle>엑셀 유형 등록</GroupTitle>
-                                <SubmitBtn type='submit'><AddTaskIcon /></SubmitBtn>
+                                <CreateBtn type='submit'><AddTaskIcon /></CreateBtn>
                             </ItemHeaderWrapper>
                         </ItemWrapper>
                     </ItemContainer>
                     <BodyContainer>
                         <HeaderInfo className="input-group mb-3">
-                            <DataTitle>업로드 엑셀 이름</DataTitle>
+                            <DataTitle><i className="icon-must" aria-label="필수항목"></i> 업로드 엑셀 이름</DataTitle>
                             <CommonInputEl type="text" name='uploadHeaderTitle'
                                 value={props.excelTitleInfo?.uploadHeaderTitle || ''}
                                 onChange={(e) => props.onChangeInputValue(e)}
@@ -105,7 +143,7 @@ const CreateTranslatorHeaderTitleComponent = (props) => {
                             />
                         </HeaderInfo>
                         <HeaderInfo className="input-group mb-3">
-                            <DataTitle>다운로드 엑셀 이름</DataTitle>
+                            <DataTitle><i className="icon-must" aria-label="필수항목"></i> 다운로드 엑셀 이름</DataTitle>
                             <CommonInputEl type="text" name='downloadHeaderTitle'
                                 value={props.excelTitleInfo?.downloadHeaderTitle || ''}
                                 onChange={(e) => props.onChangeInputValue(e)}
@@ -113,7 +151,7 @@ const CreateTranslatorHeaderTitleComponent = (props) => {
                             />
                         </HeaderInfo>
                         <HeaderInfo className="input-group mb-3">
-                            <DataTitle>데이터 시작 행</DataTitle>
+                            <DataTitle><i className="icon-must" aria-label="필수항목"></i> 데이터 시작 행</DataTitle>
                             <CommonInputEl type="number" name='rowStartNumber'
                                 value={props.excelTitleInfo?.rowStartNumber || ''}
                                 onChange={(e) => props.onChangeInputValue(e)}

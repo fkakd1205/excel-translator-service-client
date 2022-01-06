@@ -15,19 +15,25 @@ const Container = styled.div`
 
 const TitleSelector = styled.div`
     display: grid;
-    /* grid-template-columns: 15% 20% 5%; */
-    grid-template-columns: 90% 10%;
-    grid-template-rows: 1fr;
+    grid-template-columns: 50% 10%;
     padding: 20px 0px;
     text-align: center;
     align-items: center;
+
+    @media only screen and (max-width: 992px) {
+        grid-template-columns: 70% 10%;
+        place-content: center;
+    }
 `;
 
 const FormInput = styled.div`
     color: black;
     display: flex;
-    /* background-color: white; */
     vertical-align: middle;
+
+    @media only screen and (max-width: 992px) {
+        font-size: 10px;
+    }
 `;
 
 const StorageControlBtn = styled.button`
@@ -37,10 +43,6 @@ const StorageControlBtn = styled.button`
     border-radius: 3px;
     margin-left: 10px;
     padding: 10px;
-
-    @media only screen and (max-width:576px ){
-        padding: 0;
-    }
 
     &:hover {
         opacity: 0.8;
@@ -53,77 +55,101 @@ const DataContainer = styled.div`
 `;
 
 const TranslatorBtnBox = styled.div`
+    padding: 0 3%;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     text-align: center;
     align-items: center;
     background-color: #f2f5ff;
-    /* padding: 10px; */
+
+    @media only screen and (max-width: 992px){
+        grid-template-columns: 1fr;
+        
+    }
 `;
 
 const Form = styled.form`
     margin: 10px;
-    float: right;
 
-    @media only screen and (max-width:576px){
+    @media only screen and (max-width: 992px){
+        margin: 0 auto;
         width: 100%;
+    }
+`;
+
+const FromGroup = styled.div`
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 20px;
+    text-align: center;
+    align-items: center;
+
+
+    @media only screen and (max-width: 992px){
+        grid-template-columns: none;
+        grid-template-rows: repeat(1, 1fr);
     }
 `;
 
 const ControlLabel = styled.label`
     font-size: 1rem;
-    width: 90%;
-    padding: 14px;
+    display: inline-block;
     margin: 4px;
-    color: #444;
+    width: 100%;
+    padding: 3% 0%;
+    color: white;
     text-align: center;
     vertical-align: middle;
-    background-color: #fdfdfd;
+    background-color: #a9b3d5;
     border-radius: 3px;
     transition: opacity 0.1s linear;
-    font-weight: 500;
+    font-weight: 600;
 
     &:hover {
         opacity: 0.8;
         cursor: pointer;
     }
 
+    @media only screen and (max-width:992px){
+        padding: 2% 0%;
+    }
+
     @media only screen and (max-width:768px){
         font-size: 14px;
-        width: 100%;
     }
 
     @media only screen and (max-width:576px){
-        width: 100%;
         font-size: 12px;
     }
 `;
 
 const ControlBtn = styled.button`
     font-size: 1rem;
-    width: 90%;
-    padding: 14px;
+    width: 100%;
+    padding: 3% 0%;
     margin: 4px;
-    color: #444;
+    color: white;
     vertical-align: middle;
-    background-color: #fdfdfd;
+    background-color: #a9b3d5;
     border-radius: 3px;
     border: none;
     transition: opacity 0.1s linear;
-    font-weight: 500;
+    font-weight: 600;
 
     &:hover {
         opacity: 0.8;
         cursor: pointer;
     }
 
+    @media only screen and (max-width:992px){
+        padding: 2% 0%;
+    }
+
     @media only screen and (max-width:768px){
         font-size: 14px;
-        width: 100%;
     }
 
     @media only screen and (max-width:576px){
-        width: 100%;
         font-size: 12px;
     }
 `;
@@ -184,7 +210,9 @@ const ExcelTranslatorControlBar = (props) => {
 
     const onCreateTranslatorHeaderTitleModalOpen = () => {
         setCreateTranslatorHeaderTitleModalOpen(true);
-        // setExcelTranslatorTitle(new ExcelTranslatorHeader().toJSON());
+        dispatchExcelTitleInfo({
+            type: 'CLEAR'
+        })
     }
 
     const onCreateUploadExcelHeaderModalClose = () => {
@@ -274,13 +302,6 @@ const ExcelTranslatorControlBar = (props) => {
             <Container>
                 <DataContainer>
                     <TranslatorBtnBox>
-                        <Form>
-                            <ControlLabel htmlFor="upload-file-input">엑셀 파일 업로드</ControlLabel>
-                            <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => excelFileControl().uploadExcel().uploadExcelFile(e)}/>
-                        </Form>
-                        <Form  onSubmit={(e) => excelFileControl().downloadExcel().downloadTranslatedExcelFile(e)}>
-                            <ControlBtn type="submit">발주서 다운로드</ControlBtn>
-                        </Form>
                         <TitleSelector>
                             <FormInput>
                                 <div style={{ width: '100%' }}>
@@ -312,6 +333,15 @@ const ExcelTranslatorControlBar = (props) => {
                                 <StorageControlBtn type="button" onClick={() => onCreateTranslatorHeaderTitleModalOpen()}><AddIcon /></StorageControlBtn>
                             </div>
                         </TitleSelector>
+                        <FromGroup>
+                            <Form>
+                                <ControlLabel htmlFor="upload-file-input">Upload</ControlLabel>
+                                <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => excelFileControl().uploadExcel().uploadExcelFile(e)} />
+                            </Form>
+                            <Form onSubmit={(e) => excelFileControl().downloadExcel().downloadTranslatedExcelFile(e)}>
+                                <ControlBtn type="submit">Download</ControlBtn>
+                            </Form>
+                        </FromGroup>
                     </TranslatorBtnBox>
                 </DataContainer>
             </Container>

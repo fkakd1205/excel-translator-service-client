@@ -19,6 +19,11 @@ const BoardTitle = styled.div`
     align-items: center;
     padding: 10px;
 
+    @media only screen and (max-width: 992px){
+        grid-template-columns: 1fr;
+        row-gap: 10px;
+    }
+    
     @media only screen and (max-width:576px){
         font-size: 16px;
     }
@@ -40,13 +45,19 @@ const BoardContainer = styled.div`
     background-color: white;
     overflow: auto;
     border-radius: 5px;
+    font-size: 14px;
 
     & .fixed-header {
         position: sticky;
         top: -1px;
-        background: #f1f1f1;
+        background: #d5dae9;
         z-index:10;
         padding: 2px;
+        font-size: 16px;
+
+        @media only screen and (max-width:576px){
+            font-size: 14px;
+        }
     }
 
     & .large-cell {
@@ -55,6 +66,10 @@ const BoardContainer = styled.div`
 
     & .xlarge-cell {
         width: 500px;
+    }
+
+    @media only screen and (max-width:576px){
+        font-size: 12px;
     }
 `;
 
@@ -76,14 +91,30 @@ const BodyTd = styled.td`
 `;
 
 const StoreBtn = styled.button`
-    padding:2px 4px;
+    padding: 3%;
     background: rgb(179 199 219);
     color:white;
+    font-size: 1em;
+    font-weight: 500;
     border:1px solid rgb(179 199 219);
-    border-radius: 5px;
+    border-radius: 20px;
+    
+    @media only screen and (max-width: 992px){
+        display: inline-block;
+        padding: 5px;
+    }
 
     @media only screen and (max-width:576px ){
         padding: 0;
+    }
+
+    &:hover{
+        cursor: pointer;
+    }
+
+    &:active{
+        transition: 0s;
+        transform: scale(1.05);
     }
 `;
 
@@ -185,6 +216,9 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                         if(!props.selectedHeaderTitle) {
                             alert('헤더 형식을 먼저 선택해주세요.');
                             return;
+                        }else if(props.selectedHeaderTitle.uploadHeaderDetail.details.length > 0) {
+                            alert('이미 설정된 양식이 존재합니다.');
+                            return;
                         }else if(!props.uploadedExcelData) {
                             alert('저장하려는 양식의 엑셀 파일을 먼저 업로드해주세요.');
                             return;
@@ -231,12 +265,12 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                     </DataOptionBox>
                 </BoardTitle>
                 <BoardContainer>
-                    <table className="table table-sm" style={{ tableLayout: 'fixed' }}>
+                    <table className="table table-sm" style={{ tableLayout: 'fixed', width: '100%' }}>
                         <thead>
                             <tr>
                                 {uploadedExcelHeaderData?.map((data, idx) => {
                                     return (
-                                        <HeaderTh key={'upload_header_idx' + idx} className="fixed-header xlarge-cell" scope="col">
+                                        <HeaderTh key={'upload_header_idx' + idx} className="fixed-header large-cell" scope="col">
                                             <span>{data.colData}</span>
                                         </HeaderTh>
                                     )
