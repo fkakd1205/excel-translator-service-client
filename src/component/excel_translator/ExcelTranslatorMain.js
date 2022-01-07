@@ -1,5 +1,6 @@
 import { useState, useEffect, useReducer } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import queryString from 'query-string';
 
 import { excelTranslatorDataConnect } from '../../data_connect/excelTranslatorDataConnect';
 import ExcelTranslatorControlBar from './ExcelTranslatorControlBar';
@@ -23,24 +24,12 @@ class TranslatedData {
     }
 }
 
-// const initialSelectedHeaderState = null;
+const ExcelTranslatorMain = (props) => {
+    let params = queryString.parse(props.location.search);
 
-// const selectedHeaderStateReducer = (state, action) => {
-//     switch (action.type) {
-//         case 'INIT_DATA':
-//             return action.payload;
-//         default: return { ...state };
-//     }
-// }
-
-const ExcelTranslatorMain = () => {
-    const [excelTranslatorHeaderList, setExcelTranslatorHeaderList] = useState([]);
+    const [excelTranslatorHeaderList, setExcelTranslatorHeaderList] = useState(null);
     const [uploadedExcelData, setUploadedExcelData] = useState(null);
-    const [selectedHeaderTitle, setSelectedHeaderTitle] = useState(null); // old
 
-    // const [selectedHeaderState, dispatchSelectedHeaderState] = useReducer(selectedHeaderStateReducer, initialSelectedHeaderState); // new
-
-    console.log(excelTranslatorHeaderList)
     useEffect(() => {
         async function fetchInit() {
             await __handleDataConnect().searchExcelTranslatorHeader();
@@ -48,6 +37,10 @@ const ExcelTranslatorMain = () => {
 
         fetchInit();
     }, [])
+
+    useEffect(()=>{
+        setUploadedExcelData(null);
+    },[props.location])
 
     const __handleDataConnect = () => {
         return {
@@ -111,6 +104,21 @@ const ExcelTranslatorMain = () => {
                         let res = err.response;
                         alert(res?.data?.message);
                     })
+            },
+            downloadTranslatedExcelFile: async function (translatedDetail) {
+                await excelTranslatorDataConnect().downloadTranslatedExcelFile(translatedDetail)
+                    .then(res => {
+                        const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+                        const link = document.createElement('a');
+                        link.href = url;
+
+                        link.setAttribute('download', '엑셀변환기 다운로드.xlsx');
+                        document.body.appendChild(link);
+                        link.click();
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
             }
         }
     }
@@ -121,9 +129,6 @@ const ExcelTranslatorMain = () => {
                 return {
                     submit: async function (headerTitle) {
                         await __handleDataConnect().createTranslatorHeaderTitle(headerTitle);
-                    },
-                    changeSelectedHeaderTitle: function (headerTitle) {
-                        setSelectedHeaderTitle(headerTitle);
                     }
                 }
             },
@@ -209,14 +214,14 @@ const ExcelTranslatorMain = () => {
             {/* 업로드 헤더 및 데이터 보드 */}
             <ExcelTranslatorUploadDataBoard
                 uploadedExcelData={uploadedExcelData}
-                selectedHeaderTitle={selectedHeaderTitle}
+                excelTranslatorHeaderList={excelTranslatorHeaderList}
 
                 createUploadHeaderDetailsControl={(uploadDetails) => __handleEventControl().createUploadHeaderDetails().submit(uploadDetails)}
             ></ExcelTranslatorUploadDataBoard>
 
             {/* 다운로드 헤더 보드 */}
             <ExcelTranslatorDownloadExcelDataBoard
-                selectedHeaderTitle={selectedHeaderTitle}
+                excelTranslatorHeaderList={excelTranslatorHeaderList}
 
                 createDownloadHeaderDetailsControl={(downloadDetails) => __handleEventControl().createDownloadHeaderDetails().submit(downloadDetails)}
             ></ExcelTranslatorDownloadExcelDataBoard>

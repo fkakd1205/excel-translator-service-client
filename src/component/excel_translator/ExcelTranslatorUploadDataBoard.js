@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
+import queryString from 'query-string';
 import styled from "styled-components";
 import { withRouter } from 'react-router';
 import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
@@ -137,26 +138,73 @@ class UploadHeaderDetail {
     }
 }
 
-const ExcelTranslatorUploadDataBoard = (props) => {
 
-    // 헤더 데이터
-    let uploadedExcelHeaderData = props.uploadedExcelData !== null ? props.uploadedExcelData[0].uploadedData.details : null;
+const initialSelectedHeaderTitleState = null;
 
-    // 선택된 헤더의 업로드 headerDetails가 설정되어있다면 colData 지정.
-    if(props.selectedHeaderTitle?.uploadHeaderDetail.details.length) {
-        uploadedExcelHeaderData = props.selectedHeaderTitle.uploadHeaderDetail.details;
-        uploadedExcelHeaderData = uploadedExcelHeaderData.map(r => {
-            return {
-                ...r,
-                colData: r.headerName
-            }
-        });
+const selectedHeaderTitleStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        default: return { ...state }
     }
+}
 
-    // 헤더 데이터를 제외한 데이터
-    let uploadedExcelData = props.uploadedExcelData?.filter((r, idx) => idx !== 0);
+const ExcelTranslatorUploadDataBoard = (props) => {
+    const params = queryString.parse(props.location.search);
 
     const [createTranslatorUploadHeaderDetailModalOpen, setCreateTranslatorUploadHeaderDetailModalOpen] = useState(false);
+    const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
+    const [uploadedExcelHeaderData, setUploadedExcelHeaderData] = useState(null);
+    const [uploadedExcelData, setUploadedExcelData] = useState(null);
+
+    useEffect(() => {
+        function initHeaderTitleState() {
+            if (!props.excelTranslatorHeaderList) {
+                return;
+            }
+
+            setUploadedExcelHeaderData(null);
+            setUploadedExcelData(null);
+            
+            let headerId = params.headerId;
+            let headerTitleState = props.excelTranslatorHeaderList?.filter(r => r.id === headerId)[0];
+
+            dispatchSelectedHeaderTitleState({
+                type: 'INIT_DATA',
+                payload: headerTitleState
+            });
+        }
+        initHeaderTitleState();
+    }, [params.headerId, props.excelTranslatorHeaderList]);
+
+    useEffect(() => {
+        if (!selectedHeaderTitleState) {
+            return;
+        }
+
+        if (selectedHeaderTitleState?.uploadHeaderDetail.details.length) {
+            setUploadedExcelHeaderData(selectedHeaderTitleState.uploadHeaderDetail.details.map(r => {
+                return {
+                    ...r,
+                    colData: r.headerName
+                }
+            }));
+            return ;
+        }
+
+        if (props.uploadedExcelData) {
+            setUploadedExcelHeaderData(props.uploadedExcelData[0].uploadedData.details);
+            return ;
+        }
+    }, [selectedHeaderTitleState, props.uploadedExcelData]);
+
+    useEffect(() => {
+        if(!props.uploadedExcelData) {
+            return;
+        }
+        // 헤더 데이터를 제외한 데이터
+        setUploadedExcelData(props.uploadedExcelData?.filter((r, idx) => idx !== 0));
+    }, [props.uploadedExcelData]);
 
     const onCreateTranslatorUploadHeaderDetailModalOpen = () => {
         setCreateTranslatorUploadHeaderDetailModalOpen(true);
@@ -173,17 +221,17 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                     open: function (e) {
                         e.preventDefault();
 
-                        if(!props.selectedHeaderTitle) {
+                        if (!selectedHeaderTitleState) {
                             alert('헤더 형식을 먼저 선택해주세요.');
                             return;
-                        }else if(props.selectedHeaderTitle.uploadHeaderDetail.details.length > 0) {
+                        } else if (selectedHeaderTitleState.uploadHeaderDetail.details.length > 0) {
                             alert('이미 설정된 양식이 존재합니다.');
                             return;
-                        }else if(!props.uploadedExcelData) {
+                        } else if (!props.uploadedExcelData) {
                             alert('저장하려는 양식의 엑셀 파일을 먼저 업로드해주세요.');
                             return;
                         }
-                        
+
                         onCreateTranslatorUploadHeaderDetailModalOpen();
                     },
                     close: function () {
@@ -191,20 +239,20 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                     },
                     storeUploadedExcelHeaderDetail: async function (e) {
                         e.preventDefault();
-        
+
                         // 업로드된 header 데이터
                         let uploadedHeader = props.uploadedExcelData[0].uploadedData;
-        
+
                         let uploadDetails = uploadedHeader.details.map((r, idx) => {
                             let data = new UploadHeaderDetail().toJSON();
                             data.cellNumber = idx;
                             data.headerName = r.colData;
                             data.cellType = r.cellType;
-        
+
                             return data;
                         })
-        
-                        let excelHeader = props.selectedHeaderTitle;
+
+                        let excelHeader = selectedHeaderTitleState;
                         excelHeader.uploadHeaderDetail.details = uploadDetails;
 
                         await props.createUploadHeaderDetailsControl(excelHeader)
@@ -245,9 +293,9 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                                     >
                                         {data.uploadedData.details.map((detailData, detailIdx) => {
                                             return (
-                                            <BodyTd key={'upload_excel_data_detail_idx' + detailIdx} className="col">
-                                                <span>{detailData.cellType === 'Date' ? dateToYYMMDDhhmmss(detailData.colData) : detailData.colData}</span>
-                                            </BodyTd>
+                                                <BodyTd key={'upload_excel_data_detail_idx' + detailIdx} className="col">
+                                                    <span>{detailData.cellType === 'Date' ? dateToYYMMDDhhmmss(detailData.colData) : detailData.colData}</span>
+                                                </BodyTd>
                                             )
                                         })}
                                     </BodyTr>

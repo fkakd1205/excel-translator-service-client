@@ -1,6 +1,7 @@
 import { useState, useReducer, useEffect } from "react";
 import styled from "styled-components";
 import { v4 as uuidv4 } from 'uuid';
+import queryString from 'query-string';
 import { withRouter } from 'react-router';
 import CreateTranslatorDownloadHeaderDetailComponent from "./modal/CreateTranslatorDownloadHeaderDetailComponent";
 import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
@@ -126,29 +127,51 @@ class DownloadHeaderDetail {
     }
 }
 
-const initialDownloadHeaderDetail = null;
+const initialSelectedHeaderTitleState = null;
+const initialUpdateDownloadHeaderForm = null;
 
-const downloadHeaderDetailReducer = (state, action) => {
-    switch(action.type) {
+const selectedHeaderTitleStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return {...action.payload};
+        default: return { ...state }
+    }
+}
+
+const updateDownloadHeaderFormReducer = (state, action) => {
+    switch (action.type) {
         case 'INIT_DATA':
             return action.payload;
-        case 'SET_DATA':
+        case 'SET_DOWNLOAD_HEADER_DETAIL_DATA':
             return {
                 ...state,
-                [action.payload.name] : action.payload.value
+                downloadHeaderDetail:{
+                    ...state.downloadHeaderDetail,
+                    details: action.payload
+                }
+            }
+        case 'ADD_DATA':
+            return {
+                ...state,
+                downloadHeaderDetail: {
+                    ...state.downloadHeaderDetail,
+                    details: state.downloadHeaderDetail.details.concat(new DownloadHeaderDetail().toJSON())
+                }
             }
         case 'CLEAR':
             return null;
-        default: return {...state}
+        default: return { ...state }
     }
 }
 
 const ExcelTranslatorDownloadDataBoard = (props) => {
-    const [downloadHeaderDetail, dispatchDownloadHeaderDetail] = useReducer(downloadHeaderDetailReducer, initialDownloadHeaderDetail);
-    const [downloadHeaderDetailList, setDownloadHeaderDetailList] = useState([]);
+    const params = queryString.parse(props.location.search);
+
     const [createTranslatorDownloadHeaderDetailModalOpen, setCreateTranslatorDownloadHeaderDetailModalOpen] = useState(false);
     const [fixedValueCheckList, setFixedValueCheckList] = useState([]);
-    const [modifyHeaderTitle, setModifyHeaderTitle] = useState(null);
+
+    const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
+    const [updateDownloadHeaderForm, dispatchUpdateDownloadHeaderForm] = useReducer(updateDownloadHeaderFormReducer, initialUpdateDownloadHeaderForm);
 
     const onCreateTranslatorDownloadHeaderDetailModalOpen = () => {
         setCreateTranslatorDownloadHeaderDetailModalOpen(true);
@@ -158,34 +181,22 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
         setCreateTranslatorDownloadHeaderDetailModalOpen(false);
     }
 
-    const onChangeInputValue = (e, headerId) => {
-        dispatchDownloadHeaderDetail({
-            type: 'SET_DATA',
-            payload: {
-                name: e.target.name,
-                value: e.target.value
-            }
-        })
-
-        setDownloadHeaderDetailList(downloadHeaderDetailList.map(r => {
-            if(r.id === headerId) {
-                return {
-                    ...r,
-                    [e.target.name]: e.target.value
-                }    
-            }else{
-                return r;
-            }
-        }));
-    }
-
     useEffect(() => {
-        function fetchInit() {
-            setModifyHeaderTitle(props.selectedHeaderTitle);
-        }
+        function initHeaderTitleState() {
+            if (!props.excelTranslatorHeaderList) {
+                return;
+            }
 
-        fetchInit();
-    }, [props.selectedHeaderTitle]);
+            let headerId = params.headerId;
+            let headerTitleState = props.excelTranslatorHeaderList?.filter(r => r.id === headerId)[0];
+
+            dispatchSelectedHeaderTitleState({
+                type: 'INIT_DATA',
+                payload: headerTitleState
+            });
+        }
+        initHeaderTitleState();
+    }, [params.headerId, props.excelTranslatorHeaderList]);
 
     const excelFormControl = () => {
         return {
@@ -194,67 +205,99 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                     open: function (e) {
                         e.preventDefault();
 
-                        if(!props.selectedHeaderTitle) {
+                        if (!selectedHeaderTitleState) {
                             alert('헤더 형식을 먼저 선택해주세요.');
                             return;
-                        }else if(!(props.selectedHeaderTitle.uploadHeaderDetail.details.length > 0)) {
+                        } else if (!(selectedHeaderTitleState.uploadHeaderDetail.details.length > 0)) {
                             alert('업로드 엑셀 양식을 먼저 설정해주세요.');
                             return;
                         }
 
-                        // 양식이 이미 설정되어 있다면
-                        if(props.selectedHeaderTitle.downloadHeaderDetail.details.length > 0) {
-                            let detailList = modifyHeaderTitle.downloadHeaderDetail.details;
-                            setDownloadHeaderDetailList(detailList);
-                            
-                            setFixedValueCheckList(detailList.filter(r => r.targetCellNumber === -1).map(r => r.id));
-                        }else {     // 새로운 양식을 생성하는 경우
-                            setDownloadHeaderDetailList([new DownloadHeaderDetail().toJSON()]);
+                        dispatchUpdateDownloadHeaderForm({
+                            type: 'INIT_DATA',
+                            payload: {...selectedHeaderTitleState}
+                        });
+
+                        setFixedValueCheckList(selectedHeaderTitleState.downloadHeaderDetail.details.map(r => {
+                            if(r.targetCellNumber === -1){
+                                return r.id;
+                            }
+                        }));
+
+                        if(!(selectedHeaderTitleState.downloadHeaderDetail.details.length > 0)){
+                            dispatchUpdateDownloadHeaderForm({
+                                type: 'INIT_DATA',
+                                payload: {
+                                    ...selectedHeaderTitleState,
+                                    downloadHeaderDetail :{
+                                        details : [new DownloadHeaderDetail().toJSON()]
+                                    }
+                                }
+                            });
                         }
                         onCreateTranslatorDownloadHeaderDetailModalOpen();
                     },
                     close: function () {
-                        setDownloadHeaderDetailList(props.selectedHeaderTitle.downloadHeaderDetail.details);
+                        dispatchUpdateDownloadHeaderForm({
+                            type: 'CLEAR'
+                        });
                         onCreateTranslatorDownloadHeaderDetailModalClose();
                     },
                     addCell: function (e) {
                         e.preventDefault();
 
-                        setDownloadHeaderDetailList(downloadHeaderDetailList.concat(new DownloadHeaderDetail().toJSON()));
+                        dispatchUpdateDownloadHeaderForm({
+                            type: 'ADD_DATA'
+                        });
                     },
-                    deleteCell: function (e, headerId) {
+                    deleteCell: function (e, downloadHeaderId) {
                         e.preventDefault();
-        
-                        if(downloadHeaderDetailList.length > 1){
-                            setDownloadHeaderDetailList(downloadHeaderDetailList.filter(r => r.id !== headerId));
+
+                        if(updateDownloadHeaderForm.downloadHeaderDetail.details.length > 1) {
+                            let newDetails = updateDownloadHeaderForm.downloadHeaderDetail.details.filter(r=> r.id !== downloadHeaderId);
+                            
+                            dispatchUpdateDownloadHeaderForm({
+                                type:'SET_DOWNLOAD_HEADER_DETAIL_DATA',
+                                payload:newDetails
+                            })
+                        }else{
+                            alert('삭제할 수 없습니다.');
                         }
+
                     },
                     createDownloadExcelHeaderDetail: async function (e) {
                         e.preventDefault();
-
-                        let excelHeader = modifyHeaderTitle.downloadHeaderDetail;
-                        excelHeader.downloadHeaderDetail.details = downloadHeaderDetailList;
-        
-                        await props.createDownloadHeaderDetailsControl(excelHeader);
-        
+                        await props.createDownloadHeaderDetailsControl(updateDownloadHeaderForm);
+                        
+                        dispatchSelectedHeaderTitleState({
+                            type: 'INIT_DATA',
+                            payload: updateDownloadHeaderForm
+                            
+                        })
+                        
                         onCreateTranslatorDownloadHeaderDetailModalClose();
                     },
-                    selectedUploadHeaderName: function (e, customizedDataId, downloadHeaderDetailData) {
+                    selectedUploadHeaderName: function (e, downloadHeaderId) {
                         e.preventDefault();
 
-                        setDownloadHeaderDetailList(downloadHeaderDetailList.map(r => {
-                            if(r.id === customizedDataId) {
-                                // 고정값 체크되지 않은 데이터들만 targetCellNumber을 변경
-                                if(!fixedValueCheckList.includes(customizedDataId)){
-                                    r.targetCellNumber = downloadHeaderDetailData.cellNumber;
+                        let newDetails = updateDownloadHeaderForm.downloadHeaderDetail.details.map(r=>{
+                            if(r.id === downloadHeaderId){
+                                return {
+                                    ...r,
+                                    targetCellNumber : parseInt(e.target.value),
+                                    uploadHeaderId : r.id
                                 }
-                                r.refUploadHeaderName = downloadHeaderDetailData.headerName;
-                                r.uploadHeaderId = downloadHeaderDetailData.id;
-                                return r;
                             }else{
-                                return r;
+                                return {
+                                    ...r
+                                }
                             }
-                        }));
+                        });
+
+                        dispatchUpdateDownloadHeaderForm({
+                            type:'SET_DOWNLOAD_HEADER_DETAIL_DATA',
+                            payload:newDetails
+                        })
                     },
                     isChecked: function (headerId) {
                         return fixedValueCheckList.includes(headerId);
@@ -262,17 +305,30 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                     checkOne: function (e, headerId) {
                         if (e.target.checked) {
                             setFixedValueCheckList(fixedValueCheckList.concat(headerId));
-                            setDownloadHeaderDetailList(downloadHeaderDetailList.map(r => {
-                                if(r.id === headerId) {
-                                    r.targetCellNumber = -1;
-                                    return r;
-                                }else{
-                                    return r;
-                                }
-                            }));
                         } else {
                             setFixedValueCheckList(fixedValueCheckList.filter(r => r !== headerId));
                         }
+                    },
+                    onChangeInputValue: function (e, downloadHeaderId) {
+                        e.preventDefault();
+
+                        let newDetails = updateDownloadHeaderForm?.downloadHeaderDetail.details.map(r=>{
+                            if(r.id === downloadHeaderId){
+                                return {
+                                    ...r,
+                                    [e.target.name] : e.target.value
+                                }
+                            }else{
+                                return {
+                                    ...r
+                                }
+                            }
+                        });
+
+                        dispatchUpdateDownloadHeaderForm({
+                            type:'SET_DOWNLOAD_HEADER_DETAIL_DATA',
+                            payload:newDetails
+                        })
                     }
                 }
             }
@@ -292,15 +348,16 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                     <table className="table table-sm" style={{ tableLayout: 'fixed', width: '100%' }}>
                         <thead>
                             <tr>
-                                {props.selectedHeaderTitle?.downloadHeaderDetail.details.map((data, idx) => {
+                                {selectedHeaderTitleState?.downloadHeaderDetail.details.map((data, idx) => {
                                     return (
                                         <HeaderTh key={'download_header_idx' + idx} className="fixed-header large-cell" scope="col">
-                                            <span>{idx+1}. </span><span>{data.headerName}</span>
+                                            <span>{idx + 1}. </span><span>{data.headerName}</span>
                                         </HeaderTh>
                                     )
                                 })}
                             </tr>
                         </thead>
+                        <tbody style={{ maxHeight: '0px' }}></tbody>
                     </table>
                 </BoardContainer>
             </Container>
@@ -312,11 +369,12 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                 fullWidth={true}
             >
                 <CreateTranslatorDownloadHeaderDetailComponent
-                    modifyHeaderTitle={modifyHeaderTitle}
-                    downloadHeaderDetailList={downloadHeaderDetailList}
+                    selectedHeaderTitleState={selectedHeaderTitleState}
+                    updateDownloadHeaderForm={updateDownloadHeaderForm}
 
                     downloadExcelFormControl={excelFormControl().downloadExcelForm}
-                    onChangeInputValue={onChangeInputValue}
+                    selectedUploadHeaderNameControl={(e, downloadHeaderId)=>excelFormControl().downloadExcelForm().selectedUploadHeaderName(e, downloadHeaderId)}
+                    onChangeInputValueControl={(e, downloadHeaderId)=>excelFormControl().downloadExcelForm().onChangeInputValue(e, downloadHeaderId)}
                 ></CreateTranslatorDownloadHeaderDetailComponent>
             </ExcelTranslatorCommonModal>
         </>

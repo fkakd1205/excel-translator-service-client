@@ -1,5 +1,6 @@
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
+import queryString from 'query-string';
 import styled from "styled-components";
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
@@ -9,6 +10,7 @@ import Select from '@mui/material/Select';
 import AddIcon from '@mui/icons-material/Add';
 import CreateTranslatorHeaderTitleComponent from "./modal/CreateTranslatorHeaderTitleComponent";
 import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
+import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
 
 const Container = styled.div`
 `;
@@ -166,10 +168,10 @@ class ExcelTranslatorHeader {
         this.uploadHeaderTitle = '';
         this.downloadHeaderTitle = '';
         this.uploadHeaderDetail = {
-            details : []
+            details: []
         };
         this.downloadHeaderDetail = {
-            details : []
+            details: []
         };
         this.rowStartNumber = 0;
     }
@@ -189,24 +191,54 @@ class ExcelTranslatorHeader {
 const initialExcelTitle = null;
 
 const excelTitleInfoReducer = (state, action) => {
-    switch(action.type) {
+    switch (action.type) {
         case 'INIT_DATA':
             return action.payload;
         case 'SET_DATA':
             return {
                 ...state,
-                [action.payload.name] : action.payload.value
+                [action.payload.name]: action.payload.value
             }
         case 'CLEAR':
             return null;
-        default: return {...state}
+        default: return { ...state }
+    }
+}
+
+const initialSelectedHeaderTitleState = null;
+
+const selectedHeaderTitleStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        default: return { ...state }
     }
 }
 
 const ExcelTranslatorControlBar = (props) => {
+    const params = queryString.parse(props.location.search);
+
     const [excelTitleInfo, dispatchExcelTitleInfo] = useReducer(excelTitleInfoReducer, initialExcelTitle);
     const [createTranslatorHeaderTitleModalOpen, setCreateTranslatorHeaderTitleModalOpen] = useState(false);
-    const [selectedHeaderTitle, setSelectedHeaderTitle] = useState(null);
+    const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
+
+    useEffect(() => {
+        function initHeaderTitleState() {
+            if (!props.excelTranslatorHeaderList) {
+                return;
+            }
+
+            let headerId = params.headerId;
+            let headerTitleState = props.excelTranslatorHeaderList?.filter(r => r.id === headerId)[0];
+
+            dispatchSelectedHeaderTitleState({
+                type: 'INIT_DATA',
+                payload: headerTitleState
+            });
+        }
+        initHeaderTitleState();
+    }, [params.headerId, props.excelTranslatorHeaderList]);
+
 
     const onCreateTranslatorHeaderTitleModalOpen = () => {
         setCreateTranslatorHeaderTitleModalOpen(true);
@@ -246,12 +278,17 @@ const ExcelTranslatorControlBar = (props) => {
             selectHeaderTitle: function (e, selectedTitle) {
                 e.preventDefault();
 
-                // uploadedExcelData를 null로 변경
-                props.resetUploadExcelFileControl();
-
                 let selectedHeader = props.excelTranslatorHeaderList.filter(r => r.id === selectedTitle.id)[0];
-                setSelectedHeaderTitle(selectedHeader);
-                props.changeSelectedHeaderTitleControl(selectedHeader);
+
+                props.history.replace(
+                    queryString.stringifyUrl({
+                        url: props.location.pathname,
+                        query: {
+                            ...params,
+                            headerId: selectedHeader.id
+                        }
+                    })
+                )
             },
         }
     }
@@ -262,25 +299,25 @@ const ExcelTranslatorControlBar = (props) => {
                 return {
                     uploadExcelFile: async function (e) {
                         e.preventDefault();
-        
+
                         // 헤더 타이틀을 선택하지 않은 경우
-                        if(!selectedHeaderTitle) {
+                        if (!selectedHeaderTitleState) {
                             alert('헤더 형식을 먼저 선택해주세요.');
                             return;
                         }
-        
+
                         // 파일을 선택하지 않은 경우
-                        if(e.target.files.length === 0) return;
-        
+                        if (e.target.files.length === 0) return;
+
                         let addFiles = e.target.files;
-        
+
                         var uploadedFormData = new FormData();
                         uploadedFormData.append('file', addFiles[0]);
                         uploadedFormData.append(
                             "dto",
-                            new Blob([JSON.stringify(selectedHeaderTitle)], { type: "application/json" })
+                            new Blob([JSON.stringify(selectedHeaderTitleState)], { type: "application/json" })
                         );
-        
+
                         await props.uploadExcelFileControl(uploadedFormData);
                     }
                 }
@@ -290,7 +327,7 @@ const ExcelTranslatorControlBar = (props) => {
                     downloadTranslatedExcelFile: async function (e) {
                         e.preventDefault();
 
-                        await props.downloadTranslatedExcelFileControl(selectedHeaderTitle.downloadHeaderDetail.details);
+                        await props.downloadTranslatedExcelFileControl(selectedHeaderTitleState.downloadHeaderDetail.details);
                     }
                 }
             },
@@ -311,16 +348,16 @@ const ExcelTranslatorControlBar = (props) => {
                                             <Select
                                                 labelId="storage-title-select-id"
                                                 id="storage-title-select"
-                                                value={selectedHeaderTitle?.uploadHeaderTitle + ' > ' + selectedHeaderTitle?.downloadHeaderTitle || ''}
+                                                value={selectedHeaderTitleState?.uploadHeaderTitle + ' > ' + selectedHeaderTitleState?.downloadHeaderTitle || ''}
                                                 label="storage-title-selector"
                                                 defaultValue=''
                                             >
                                                 {props.excelTranslatorHeaderList?.map((data, idx) => {
                                                     return (
-                                                        <MenuItem key={'excel_translator_title' + idx} 
-                                                            value={data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle} 
+                                                        <MenuItem key={'excel_translator_title' + idx}
+                                                            value={data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle}
                                                             onClick={(e) => excelTranslatorHeaderControl().selectHeaderTitle(e, data)}>
-                                                                {data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle}
+                                                            {data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle}
                                                         </MenuItem>
                                                     )
                                                 })}
@@ -364,4 +401,4 @@ const ExcelTranslatorControlBar = (props) => {
     )
 }
 
-export default ExcelTranslatorControlBar;
+export default withRouter(ExcelTranslatorControlBar);
