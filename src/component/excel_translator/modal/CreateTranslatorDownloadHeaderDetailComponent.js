@@ -215,10 +215,9 @@ const CreateBtn = styled.button`
 `;
 
 const CreateTranslatorDownloadHeaderDetailComponent = (props) => {
-    
     // downloadHeaderDetailList의 targetCellNumber를 추적해 업로드 엑셀의 헤더명을 찾는다.
     let downloadHeaderDetailList = props.downloadHeaderDetailList?.map(detail => {
-        let data = props.selectedHeaderTitle?.uploadHeaderDetail.details.filter(r => detail.targetCellNumber === r.cellNumber)[0];
+        let data = props.modifyHeaderTitle?.uploadHeaderDetail.details.filter(r => detail.targetCellNumber === r.cellNumber)[0];
         
         if(data) {
             return {
@@ -265,11 +264,11 @@ const CreateTranslatorDownloadHeaderDetailComponent = (props) => {
                                                                 value={data.refUploadHeaderName || ''}
                                                                 sx={{ height: 40 }}
                                                             >
-                                                                {props.selectedHeaderTitle?.uploadHeaderDetail.details.map((data2, idx2) => {
+                                                                {props.modifyHeaderTitle?.uploadHeaderDetail.details.map((headerTitle, idx2) => {
                                                                     return (
-                                                                        <MenuItem key={'excel_translator_download_title' + idx2} value={data2.headerName}
-                                                                            onClick={(e) => props.downloadExcelFormControl().selectedUploadHeaderName(e, data.id, data2)}
-                                                                        >{data2.headerName}</MenuItem>
+                                                                        <MenuItem key={'excel_translator_download_title' + idx2} value={headerTitle.headerName}
+                                                                            onClick={(e) => props.downloadExcelFormControl().selectedUploadHeaderName(e, data.id, headerTitle)}
+                                                                        >{headerTitle.headerName}</MenuItem>
                                                                     )
                                                                 })}
                                                             </Select>

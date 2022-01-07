@@ -77,6 +77,7 @@ const HeaderTh = styled.th`
     vertical-align: middle !important;
     text-align: center;
     width: 150px;
+    border-right: 1px solid #efefef;
 `;
 
 const BodyTr = styled.tr`
@@ -163,47 +164,6 @@ const ExcelTranslatorUploadDataBoard = (props) => {
 
     const onCreateTranslatorUploadHeaderDetailModalClose = () => {
         setCreateTranslatorUploadHeaderDetailModalOpen(false);
-    }
-
-    const excelFileControl = () => {
-        return {
-            uploadExcel: function () {
-                return {
-                    uploadExcelFile: async function (e) {
-                        e.preventDefault();
-        
-                        // 헤더 타이틀을 선택하지 않은 경우
-                        if(!props.selectedHeaderTitle) {
-                            alert('헤더 형식을 먼저 선택해주세요.');
-                            return;
-                        }
-        
-                        // 파일을 선택하지 않은 경우
-                        if(e.target.files.length === 0) return;
-        
-                        let addFiles = e.target.files;
-        
-                        var uploadedFormData = new FormData();
-                        uploadedFormData.append('file', addFiles[0]);
-                        uploadedFormData.append(
-                            "dto",
-                            new Blob([JSON.stringify(props.selectedHeaderTitle)], { type: "application/json" })
-                        );
-        
-                        await props.uploadExcelFileControl(uploadedFormData);
-                    }
-                }
-            },
-            downloadExcel: function () {
-                return {
-                    downloadTranslatedExcelFile: async function (e) {
-                        e.preventDefault();
-
-                        await props.downloadTranslatedExcelFileControl(props.selectedHeaderTitle.downloadHeaderDetail.details);
-                    }
-                }
-            }
-        }
     }
 
     const excelFormControl = () => {

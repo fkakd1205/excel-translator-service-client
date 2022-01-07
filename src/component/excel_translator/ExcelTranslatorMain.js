@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect, useReducer } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { excelTranslatorDataConnect } from '../../data_connect/excelTranslatorDataConnect';
@@ -11,7 +11,7 @@ class TranslatedData {
     constructor() {
         this.id = uuidv4();
         this.translatedData = {
-            details : []
+            details: []
         };
     }
 
@@ -23,11 +23,24 @@ class TranslatedData {
     }
 }
 
+// const initialSelectedHeaderState = null;
+
+// const selectedHeaderStateReducer = (state, action) => {
+//     switch (action.type) {
+//         case 'INIT_DATA':
+//             return action.payload;
+//         default: return { ...state };
+//     }
+// }
+
 const ExcelTranslatorMain = () => {
     const [excelTranslatorHeaderList, setExcelTranslatorHeaderList] = useState([]);
     const [uploadedExcelData, setUploadedExcelData] = useState(null);
-    const [selectedHeaderTitle, setSelectedHeaderTitle] = useState(null);
+    const [selectedHeaderTitle, setSelectedHeaderTitle] = useState(null); // old
 
+    // const [selectedHeaderState, dispatchSelectedHeaderState] = useReducer(selectedHeaderStateReducer, initialSelectedHeaderState); // new
+
+    console.log(excelTranslatorHeaderList)
     useEffect(() => {
         async function fetchInit() {
             await __handleDataConnect().searchExcelTranslatorHeader();
@@ -130,22 +143,22 @@ const ExcelTranslatorMain = () => {
                         // 다운로드 양식으로 변경
                         let excelData = downloadHeaderDetail.map(r => {
                             return uploadedExcelData.map((data, idx) => {
-                                if(idx === 0) {
+                                if (idx === 0) {
                                     // 다운로드 헤더 이름 설정
                                     let details = {
                                         colData: r.headerName,
                                         cellType: 'String'
                                     }
                                     return details;
-                                }else{
+                                } else {
                                     // 고정값 컬럼이라면
-                                    if(r.targetCellNumber === -1) {
+                                    if (r.targetCellNumber === -1) {
                                         let details = {
                                             colData: r.fixedValue,
                                             cellType: 'String'
                                         };
                                         return details;
-                                    }else {
+                                    } else {
                                         return data.uploadedData.details[r.targetCellNumber];
                                     }
                                 }

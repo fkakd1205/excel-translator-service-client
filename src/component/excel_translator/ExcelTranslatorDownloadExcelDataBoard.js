@@ -1,4 +1,4 @@
-import { useState, useReducer } from "react";
+import { useState, useReducer, useEffect } from "react";
 import styled from "styled-components";
 import { v4 as uuidv4 } from 'uuid';
 import { withRouter } from 'react-router';
@@ -75,6 +75,7 @@ const HeaderTh = styled.th`
     vertical-align: middle !important;
     text-align: center;
     width: 150px;
+    border-right: 1px solid #efefef;
 `;
 
 const StoreBtn = styled.button`
@@ -147,7 +148,8 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
     const [downloadHeaderDetailList, setDownloadHeaderDetailList] = useState([]);
     const [createTranslatorDownloadHeaderDetailModalOpen, setCreateTranslatorDownloadHeaderDetailModalOpen] = useState(false);
     const [fixedValueCheckList, setFixedValueCheckList] = useState([]);
-    
+    const [modifyHeaderTitle, setModifyHeaderTitle] = useState(null);
+
     const onCreateTranslatorDownloadHeaderDetailModalOpen = () => {
         setCreateTranslatorDownloadHeaderDetailModalOpen(true);
     }
@@ -177,6 +179,14 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
         }));
     }
 
+    useEffect(() => {
+        function fetchInit() {
+            setModifyHeaderTitle(props.selectedHeaderTitle);
+        }
+
+        fetchInit();
+    }, [props.selectedHeaderTitle]);
+
     const excelFormControl = () => {
         return {
             downloadExcelForm: function () {
@@ -191,13 +201,12 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                             alert('업로드 엑셀 양식을 먼저 설정해주세요.');
                             return;
                         }
-                        
 
                         // 양식이 이미 설정되어 있다면
                         if(props.selectedHeaderTitle.downloadHeaderDetail.details.length > 0) {
-                            let detailList = props.selectedHeaderTitle.downloadHeaderDetail.details;
-
+                            let detailList = modifyHeaderTitle.downloadHeaderDetail.details;
                             setDownloadHeaderDetailList(detailList);
+                            
                             setFixedValueCheckList(detailList.filter(r => r.targetCellNumber === -1).map(r => r.id));
                         }else {     // 새로운 양식을 생성하는 경우
                             setDownloadHeaderDetailList([new DownloadHeaderDetail().toJSON()]);
@@ -205,6 +214,7 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                         onCreateTranslatorDownloadHeaderDetailModalOpen();
                     },
                     close: function () {
+                        setDownloadHeaderDetailList(props.selectedHeaderTitle.downloadHeaderDetail.details);
                         onCreateTranslatorDownloadHeaderDetailModalClose();
                     },
                     addCell: function (e) {
@@ -221,8 +231,8 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                     },
                     createDownloadExcelHeaderDetail: async function (e) {
                         e.preventDefault();
-        
-                        let excelHeader = props.selectedHeaderTitle;
+
+                        let excelHeader = modifyHeaderTitle.downloadHeaderDetail;
                         excelHeader.downloadHeaderDetail.details = downloadHeaderDetailList;
         
                         await props.createDownloadHeaderDetailsControl(excelHeader);
@@ -244,7 +254,7 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                             }else{
                                 return r;
                             }
-                        }))
+                        }));
                     },
                     isChecked: function (headerId) {
                         return fixedValueCheckList.includes(headerId);
@@ -294,7 +304,6 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                     </table>
                 </BoardContainer>
             </Container>
-
             {/* Create Download Header Modal */}
             <ExcelTranslatorCommonModal
                 open={createTranslatorDownloadHeaderDetailModalOpen}
@@ -303,7 +312,7 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                 fullWidth={true}
             >
                 <CreateTranslatorDownloadHeaderDetailComponent
-                    selectedHeaderTitle={props.selectedHeaderTitle}
+                    modifyHeaderTitle={modifyHeaderTitle}
                     downloadHeaderDetailList={downloadHeaderDetailList}
 
                     downloadExcelFormControl={excelFormControl().downloadExcelForm}
