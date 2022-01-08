@@ -145,12 +145,14 @@ const selectedHeaderTitleStateReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
             return action.payload;
+        case 'CLEAR':
+            return null;
         default: return { ...state }
     }
 }
 
 const ExcelTranslatorUploadDataBoard = (props) => {
-    const params = queryString.parse(props.location.search);
+    let params = queryString.parse(props.location.search);
 
     const [createTranslatorUploadHeaderDetailModalOpen, setCreateTranslatorUploadHeaderDetailModalOpen] = useState(false);
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
@@ -161,6 +163,12 @@ const ExcelTranslatorUploadDataBoard = (props) => {
         function initHeaderTitleState() {
             if (!props.excelTranslatorHeaderList) {
                 return;
+            }
+
+            if(!params.headerId) {
+                dispatchSelectedHeaderTitleState({
+                    type: 'CLEAR'
+                })
             }
 
             setUploadedExcelHeaderData(null);

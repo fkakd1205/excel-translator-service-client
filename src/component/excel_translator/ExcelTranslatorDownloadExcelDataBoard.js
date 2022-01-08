@@ -134,6 +134,8 @@ const selectedHeaderTitleStateReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
             return {...action.payload};
+        case 'CLEAR':
+            return null;
         default: return { ...state }
     }
 }
@@ -165,7 +167,7 @@ const updateDownloadHeaderFormReducer = (state, action) => {
 }
 
 const ExcelTranslatorDownloadDataBoard = (props) => {
-    const params = queryString.parse(props.location.search);
+    let params = queryString.parse(props.location.search);
 
     const [createTranslatorDownloadHeaderDetailModalOpen, setCreateTranslatorDownloadHeaderDetailModalOpen] = useState(false);
     const [fixedValueCheckList, setFixedValueCheckList] = useState([]);
@@ -185,6 +187,12 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
         function initHeaderTitleState() {
             if (!props.excelTranslatorHeaderList) {
                 return;
+            }
+
+            if(!params.headerId) {
+                dispatchSelectedHeaderTitleState({
+                    type: 'CLEAR'
+                })
             }
 
             let headerId = params.headerId;
@@ -348,7 +356,7 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                     <table className="table table-sm" style={{ tableLayout: 'fixed', width: '100%' }}>
                         <thead>
                             <tr>
-                                {selectedHeaderTitleState?.downloadHeaderDetail.details.map((data, idx) => {
+                                {selectedHeaderTitleState?.downloadHeaderDetail?.details.map((data, idx) => {
                                     return (
                                         <HeaderTh key={'download_header_idx' + idx} className="fixed-header large-cell" scope="col">
                                             <span>{idx + 1}. </span><span>{data.headerName}</span>

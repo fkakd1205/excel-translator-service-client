@@ -118,13 +118,16 @@ const DownloadDataGroup = styled.div`
         grid-template-columns: 1fr;
         place-content: center;
     }
+
+    @media only screen and (max-width:576px){
+        grid-template-columns: 100%;
+    }
 `;
 
 const DownloadInfo = styled.div`
     background-color: white;
     padding: 20px;
     border-radius: 10px;
-
 `;
 
 const DeleteBox = styled.div`
@@ -173,6 +176,12 @@ const DataGroup = styled.div`
         display: grid;
         grid-template-columns: 1fr;
         row-gap: 10px;
+        place-content: center;
+        /* padding: 0 10%; */
+    }
+
+    @media only screen and (max-width:576px){
+        grid-template-columns: 100%;
     }
 `;
 

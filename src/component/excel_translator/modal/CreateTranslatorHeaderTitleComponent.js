@@ -59,7 +59,6 @@ const BodyContainer = styled.div`
 const CommonInputEl = styled.input`
     font-size: 1.1rem;
     border: none;
-    /* width: 100%; */
     padding: 10px;
     border-bottom: 1px solid #ced4da;
     &:focus{

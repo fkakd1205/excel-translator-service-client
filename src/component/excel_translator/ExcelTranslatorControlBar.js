@@ -211,21 +211,31 @@ const selectedHeaderTitleStateReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
             return action.payload;
+        case 'CLEAR':
+            return null;
         default: return { ...state }
     }
 }
 
 const ExcelTranslatorControlBar = (props) => {
-    const params = queryString.parse(props.location.search);
+    let pathname = props.location.pathname;
+    let params = queryString.parse(props.location.search);
 
     const [excelTitleInfo, dispatchExcelTitleInfo] = useReducer(excelTitleInfoReducer, initialExcelTitle);
     const [createTranslatorHeaderTitleModalOpen, setCreateTranslatorHeaderTitleModalOpen] = useState(false);
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
 
+    // Get Excel Translator Header Detail
     useEffect(() => {
         function initHeaderTitleState() {
             if (!props.excelTranslatorHeaderList) {
                 return;
+            }
+            
+            if(!params.headerId) {
+                dispatchSelectedHeaderTitleState({
+                    type: 'CLEAR'
+                })
             }
 
             let headerId = params.headerId;
@@ -280,15 +290,13 @@ const ExcelTranslatorControlBar = (props) => {
 
                 let selectedHeader = props.excelTranslatorHeaderList.filter(r => r.id === selectedTitle.id)[0];
 
-                props.history.replace(
-                    queryString.stringifyUrl({
-                        url: props.location.pathname,
-                        query: {
-                            ...params,
-                            headerId: selectedHeader.id
-                        }
-                    })
-                )
+                props.history.replace({
+                    pathname: pathname,
+                    search: `?${queryString.stringify({
+                        ...params,
+                        headerId: selectedHeader.id
+                    })}`
+                })
             },
         }
     }
