@@ -9,7 +9,6 @@ import CreateTranslatorUploadHeaderDetailComponent from "./modal/CreateTranslato
 
 const Container = styled.div`
     padding: 0 2%;
-    background-color: #f2f5ff;
 `;
 
 const BoardTitle = styled.div`
@@ -168,7 +167,8 @@ const ExcelTranslatorUploadDataBoard = (props) => {
             if(!params.headerId) {
                 dispatchSelectedHeaderTitleState({
                     type: 'CLEAR'
-                })
+                });
+                return;
             }
 
             setUploadedExcelHeaderData(null);
@@ -253,15 +253,20 @@ const ExcelTranslatorUploadDataBoard = (props) => {
 
                         let uploadDetails = uploadedHeader.details.map((r, idx) => {
                             let data = new UploadHeaderDetail().toJSON();
-                            data.cellNumber = idx;
-                            data.headerName = r.colData;
-                            data.cellType = r.cellType;
+                            data = {
+                                ...data,
+                                cellNumber: idx,
+                                headerName: r.colData,
+                                cellType: r.cellType
+                            };
 
                             return data;
                         })
 
-                        let excelHeader = selectedHeaderTitleState;
-                        excelHeader.uploadHeaderDetail.details = uploadDetails;
+                        let excelHeader = {
+                            ...selectedHeaderTitleState.uploadHeaderDetail,
+                            details: uploadDetails
+                        };
 
                         await props.createUploadHeaderDetailsControl(excelHeader)
                         onCreateTranslatorUploadHeaderDetailModalClose();

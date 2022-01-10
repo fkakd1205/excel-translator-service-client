@@ -8,9 +8,13 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
+
+import BackdropLoading from '../excel_translator/loading/BackdropLoading';
 import CreateTranslatorHeaderTitleComponent from "./modal/CreateTranslatorHeaderTitleComponent";
 import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
-import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
+import ModifyTranslatorHeaderTitleComponent from "./modal/ModifyTranslatorHeaderTitleComponent";
 
 const Container = styled.div`
 `;
@@ -39,9 +43,9 @@ const FormInput = styled.div`
 `;
 
 const StorageControlBtn = styled.button`
-    background: #a2a9c1;
+    background: #989fb7;
     color:white;
-    border:1px solid #a2a9c1;
+    border:1px solid #989fb7;
     border-radius: 3px;
     margin-left: 10px;
     padding: 10px;
@@ -53,7 +57,6 @@ const StorageControlBtn = styled.button`
 `;
 
 const DataContainer = styled.div`
-    background-color: #f2f5ff;
 `;
 
 const TranslatorBtnBox = styled.div`
@@ -62,11 +65,9 @@ const TranslatorBtnBox = styled.div`
     grid-template-columns: repeat(2, 1fr);
     text-align: center;
     align-items: center;
-    background-color: #f2f5ff;
 
     @media only screen and (max-width: 992px){
-        grid-template-columns: 1fr;
-        
+        grid-template-columns: 100%;
     }
 `;
 
@@ -162,6 +163,10 @@ const Input = styled.input`
     display: none;
 `;
 
+const TitleControlBox = styled.div`
+    display: flex;
+`;
+
 class ExcelTranslatorHeader {
     constructor() {
         this.id = uuidv4();
@@ -189,6 +194,7 @@ class ExcelTranslatorHeader {
 }
 
 const initialExcelTitle = null;
+const initialSelectedHeaderTitleState = null;
 
 const excelTitleInfoReducer = (state, action) => {
     switch (action.type) {
@@ -205,8 +211,6 @@ const excelTitleInfoReducer = (state, action) => {
     }
 }
 
-const initialSelectedHeaderTitleState = null;
-
 const selectedHeaderTitleStateReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
@@ -222,8 +226,10 @@ const ExcelTranslatorControlBar = (props) => {
     let params = queryString.parse(props.location.search);
 
     const [excelTitleInfo, dispatchExcelTitleInfo] = useReducer(excelTitleInfoReducer, initialExcelTitle);
-    const [createTranslatorHeaderTitleModalOpen, setCreateTranslatorHeaderTitleModalOpen] = useState(false);
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
+    const [createTranslatorHeaderTitleModalOpen, setCreateTranslatorHeaderTitleModalOpen] = useState(false);
+    const [modifyTranslatorHeaderTitleModalOpen, setModifyTranslatorHeaderTitleModalOpen] = useState(false);
+    const [backdropLoading, setBackdropLoading] = useState(false);
 
     // Get Excel Translator Header Detail
     useEffect(() => {
@@ -236,6 +242,7 @@ const ExcelTranslatorControlBar = (props) => {
                 dispatchSelectedHeaderTitleState({
                     type: 'CLEAR'
                 })
+                return;
             }
 
             let headerId = params.headerId;
@@ -261,6 +268,23 @@ const ExcelTranslatorControlBar = (props) => {
         setCreateTranslatorHeaderTitleModalOpen(false);
     }
 
+    const onModifyTranslatorHeaderTitleModalOpen = () => {
+        setModifyTranslatorHeaderTitleModalOpen(true);
+        
+        dispatchExcelTitleInfo({
+            type: 'INIT_DATA',
+            payload: {
+                downloadHeaderTitle: selectedHeaderTitleState.downloadHeaderTitle,
+                uploadHeaderTitle: selectedHeaderTitleState.uploadHeaderTitle,
+                rowStartNumber: selectedHeaderTitleState.rowStartNumber
+            }
+        });
+    }
+
+    const onModifyUploadExcelHeaderModalClose = () => {
+        setModifyTranslatorHeaderTitleModalOpen(false);
+    }
+
     const onChangeInputValue = (e) => {
         dispatchExcelTitleInfo({
             type: 'SET_DATA',
@@ -268,7 +292,7 @@ const ExcelTranslatorControlBar = (props) => {
                 name: e.target.name,
                 value: e.target.value
             }
-        })
+        });
     }
 
     const excelTranslatorHeaderControl = () => {
@@ -278,17 +302,46 @@ const ExcelTranslatorControlBar = (props) => {
 
                 // 엑셀 타이틀 정보 설정 (업로드 타이틀, 다운로드 타이틀, 데이터 시작 행)
                 let excelHeader = new ExcelTranslatorHeader().toJSON();
-                excelHeader.uploadHeaderTitle = excelTitleInfo.uploadHeaderTitle;
-                excelHeader.downloadHeaderTitle = excelTitleInfo.downloadHeaderTitle;
-                excelHeader.rowStartNumber = excelTitleInfo.rowStartNumber;
-
+                excelHeader = {
+                    ...excelHeader,
+                    uploadHeaderTitle: excelTitleInfo.uploadHeaderTitle,
+                    downloadHeaderTitle: excelTitleInfo.downloadHeaderTitle,
+                    rowStartNumber: excelTitleInfo.rowStartNumber
+                }
+                
                 await props.createTranslatorHeaderTitleControl(excelHeader);
+                
+                // 새로 생성된 타이틀 형식이 선택되도록 설정.
+                props.history.replace({
+                    pathname: pathname,
+                    search: `?${queryString.stringify({
+                        ...params,
+                        headerId: excelHeader.id
+                    })}`
+                })
+
                 onCreateUploadExcelHeaderModalClose();
             },
-            selectHeaderTitle: function (e, selectedTitle) {
+            modify: async function (e) {
                 e.preventDefault();
 
-                let selectedHeader = props.excelTranslatorHeaderList.filter(r => r.id === selectedTitle.id)[0];
+                // 엑셀 타이틀 정보 설정 (업로드 타이틀, 다운로드 타이틀, 데이터 시작 행)
+                let excelHeader = new ExcelTranslatorHeader().toJSON();
+                excelHeader = {
+                    ...excelHeader,
+                    id: selectedHeaderTitleState.id,
+                    uploadHeaderTitle: excelTitleInfo.uploadHeaderTitle,
+                    downloadHeaderTitle: excelTitleInfo.downloadHeaderTitle,
+                    rowStartNumber: excelTitleInfo.rowStartNumber
+                }
+
+                await props.modifyTranslatorHeaderTitleControl(excelHeader);
+                onModifyUploadExcelHeaderModalClose();
+            },
+            selectHeaderTitle: function (e) {
+                e.preventDefault();
+
+                let selectedHeader = props.excelTranslatorHeaderList.filter(r => r.id === e.target.value)[0];
 
                 props.history.replace({
                     pathname: pathname,
@@ -326,7 +379,9 @@ const ExcelTranslatorControlBar = (props) => {
                             new Blob([JSON.stringify(selectedHeaderTitleState)], { type: "application/json" })
                         );
 
+                        loadingControl().open();
                         await props.uploadExcelFileControl(uploadedFormData);
+                        loadingControl().close();
                     }
                 }
             },
@@ -335,10 +390,23 @@ const ExcelTranslatorControlBar = (props) => {
                     downloadTranslatedExcelFile: async function (e) {
                         e.preventDefault();
 
+                        loadingControl().open();
                         await props.downloadTranslatedExcelFileControl(selectedHeaderTitleState.downloadHeaderDetail.details);
+                        loadingControl().close();
                     }
                 }
             },
+        }
+    }
+
+    const loadingControl = () => {
+        return {
+            open : function () {
+                setBackdropLoading(true);
+            },
+            close: function () {
+                setBackdropLoading(false);
+            }
         }
     }
 
@@ -356,16 +424,15 @@ const ExcelTranslatorControlBar = (props) => {
                                             <Select
                                                 labelId="storage-title-select-id"
                                                 id="storage-title-select"
-                                                value={selectedHeaderTitleState?.uploadHeaderTitle + ' > ' + selectedHeaderTitleState?.downloadHeaderTitle || ''}
+                                                value={selectedHeaderTitleState?.id || ''}
                                                 label="storage-title-selector"
+                                                onChange={(e) => excelTranslatorHeaderControl().selectHeaderTitle(e)}
                                                 defaultValue=''
                                             >
                                                 {props.excelTranslatorHeaderList?.map((data, idx) => {
                                                     return (
-                                                        <MenuItem key={'excel_translator_title' + idx}
-                                                            value={data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle}
-                                                            onClick={(e) => excelTranslatorHeaderControl().selectHeaderTitle(e, data)}>
-                                                            {data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle}
+                                                        <MenuItem key={'excel_translator_title' + idx} value={data.id}>
+                                                            {data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle + ' (' + data.rowStartNumber + ')'}
                                                         </MenuItem>
                                                     )
                                                 })}
@@ -374,9 +441,10 @@ const ExcelTranslatorControlBar = (props) => {
                                     </Box>
                                 </div>
                             </FormInput>
-                            <div>
+                            <TitleControlBox>
                                 <StorageControlBtn type="button" onClick={() => onCreateTranslatorHeaderTitleModalOpen()}><AddIcon /></StorageControlBtn>
-                            </div>
+                                <StorageControlBtn type="button" onClick={() => onModifyTranslatorHeaderTitleModalOpen()}><EditIcon /></StorageControlBtn>
+                            </TitleControlBox>
                         </TitleSelector>
                         <FromGroup>
                             <Form>
@@ -391,6 +459,9 @@ const ExcelTranslatorControlBar = (props) => {
                 </DataContainer>
             </Container>
 
+            {/* Backdrop */}
+            <BackdropLoading open={backdropLoading} />
+
             {/* Create Header Title Modal */}
             <ExcelTranslatorCommonModal
                 open={createTranslatorHeaderTitleModalOpen}
@@ -404,6 +475,21 @@ const ExcelTranslatorControlBar = (props) => {
                     onChangeInputValue={onChangeInputValue}
                     excelTranslatorHeaderControl={excelTranslatorHeaderControl}
                 ></CreateTranslatorHeaderTitleComponent>
+            </ExcelTranslatorCommonModal>
+
+            {/* Modify Header Title Modal */}
+            <ExcelTranslatorCommonModal
+                open={modifyTranslatorHeaderTitleModalOpen}
+                onClose={() => onModifyUploadExcelHeaderModalClose()}
+                maxWidth={'xs'}
+                fullWidth={true}
+            >
+                <ModifyTranslatorHeaderTitleComponent
+                    excelTitleInfo={excelTitleInfo}
+
+                    onChangeInputValue={onChangeInputValue}
+                    excelTranslatorHeaderControl={excelTranslatorHeaderControl}
+                ></ModifyTranslatorHeaderTitleComponent>
             </ExcelTranslatorCommonModal>
         </>
     )

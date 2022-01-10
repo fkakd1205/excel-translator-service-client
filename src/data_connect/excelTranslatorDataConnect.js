@@ -12,6 +12,11 @@ const excelTranslatorDataConnect = () => {
                 withCredentials: true
             })
         },
+        putOne: async function (headerTitle) {
+            return await axios.put(`api/v1/excel-translator/one`, headerTitle, {
+                withCredentials: true
+            })
+        },
         postFile: async function (formData) {
             return await axios.post(`/api/v1/excel-translator/upload`, formData, {
                 headers: {

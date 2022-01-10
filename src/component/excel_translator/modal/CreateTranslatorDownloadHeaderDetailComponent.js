@@ -228,7 +228,7 @@ const CreateTranslatorDownloadHeaderDetailComponent = (props) => {
     // 다운로드 엑셀 헤더의 targetCellNumber에 대응하는 업로드 엑셀의 헤더명을 찾는다.
     const getUploadHeaderName = (targetCellNumber) => {
         let result = props.updateDownloadHeaderForm?.uploadHeaderDetail?.details.filter(r => r.cellNumber === targetCellNumber)[0];
-        return result?.cellNumber || -1;
+        return result?.cellNumber ?? -1;
     }
 
     return (
@@ -269,12 +269,11 @@ const CreateTranslatorDownloadHeaderDetailComponent = (props) => {
                                                                 >
                                                                     {props.updateDownloadHeaderForm?.uploadHeaderDetail?.details.map((headerTitle, idx2) => {
                                                                         return (
-                                                                            <MenuItem key={'excel_translator_download_title' + idx2} value={parseInt(headerTitle.cellNumber)}
+                                                                            <MenuItem key={'excel_translator_upload_header_name' + idx2} value={parseInt(headerTitle.cellNumber)}
                                                                             >{headerTitle.headerName}</MenuItem>
                                                                         )
                                                                     })}
-                                                                    <MenuItem value={'고정값'} disabled
-                                                                    >고정값</MenuItem>
+                                                                    <MenuItem value={'고정값'} disabled>고정값</MenuItem>
                                                                 </Select>
                                                             </FormControl>
                                                         </Box>

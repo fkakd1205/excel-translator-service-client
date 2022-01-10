@@ -61,7 +61,6 @@ const CommonInputEl = styled.input`
     border: none;
     padding: 10px;
     border-bottom: 1px solid #ced4da;
-
     &:focus{
         outline: none;
         border: 1px solid #4662B4;
@@ -120,15 +119,15 @@ const CreateBtn = styled.button`
     }
 `;
 
-const CreateTranslatorHeaderTitleComponent = (props) => {
+const ModifyTranslatorHeaderTitleComponent = (props) => {
     return (
         <>
             <Container>
-                <form onSubmit={(e) => props.excelTranslatorHeaderControl().submit(e)}>
+                <form onSubmit={(e) => props.excelTranslatorHeaderControl().modify(e)}>
                     <ItemContainer>
                         <ItemWrapper>
                             <ItemHeaderWrapper>
-                                <GroupTitle>엑셀 유형 등록</GroupTitle>
+                                <GroupTitle>엑셀 유형 수정</GroupTitle>
                                 <CreateBtn type='submit'><AddTaskIcon /></CreateBtn>
                             </ItemHeaderWrapper>
                         </ItemWrapper>
@@ -166,4 +165,4 @@ const CreateTranslatorHeaderTitleComponent = (props) => {
     )
 }
 
-export default CreateTranslatorHeaderTitleComponent;
+export default ModifyTranslatorHeaderTitleComponent;
