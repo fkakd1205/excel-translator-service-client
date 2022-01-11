@@ -17,6 +17,14 @@ const excelTranslatorDataConnect = () => {
                 withCredentials: true
             })
         },
+        deleteOne: async function (headerId) {
+            return await axios.delete(`api/v1/excel-translator/one`, {
+                params: {
+                    headerId: headerId
+                },
+                withCredentials: true
+            })
+        },
         postFile: async function (formData) {
             return await axios.post(`/api/v1/excel-translator/upload`, formData, {
                 headers: {

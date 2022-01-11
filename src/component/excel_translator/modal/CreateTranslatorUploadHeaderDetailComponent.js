@@ -27,6 +27,7 @@ const GroupTitle = styled.div`
     font-size: 1.3rem;
     font-weight: 700;
     padding:15px;
+
     @media only screen and (max-width:425px){
         padding: 15px 0;
     }
@@ -99,7 +100,7 @@ const CreateTranslatorUploadHeaderDetailComponent = (props) => {
                         </ItemWrapper>
                     </ItemContainer>
                     <BodyContainer>
-                        {props.uploadedExcelDataHeader[0]?.uploadedData.details?.map((data, idx) => {
+                        {props.uploadedExcelDataHeader && props.uploadedExcelDataHeader[0]?.uploadedData.details?.map((data, idx) => {
                             return (
                                 <HeaderInfo key={'upload_header_detail_idx' + idx} className="input-group mb-3">
                                     <DataText><span>{idx+1}.</span> <span>{data.colData}</span></DataText>

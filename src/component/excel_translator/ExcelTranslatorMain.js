@@ -93,6 +93,19 @@ const ExcelTranslatorMain = (props) => {
                         alert(res?.data?.message);
                     });
             },
+            deleteTranslatorHeaderTitle: async function (headerId) {
+                await excelTranslatorDataConnect().deleteOne(headerId)
+                    .then(res => {
+                        if (res.status === 200 && res.data && res.data.message === 'success') {
+                            alert('삭제되었습니다.');
+                            this.searchExcelTranslatorHeader();
+                        }
+                    })
+                    .catch(err => {
+                        let res = err.response;
+                        alert(res?.data?.message);
+                    });
+            },
             uploadExcelFile: async function (uploadedFormData) {
                 await excelTranslatorDataConnect().postFile(uploadedFormData)
                     .then(res => {
@@ -110,6 +123,7 @@ const ExcelTranslatorMain = (props) => {
                     .then(res => {
                         if (res.status === 200 && res.data && res.data.message === 'success') {
                             alert('저장되었습니다.');
+                            this.searchExcelTranslatorHeader();
                         }
                     })
                     .catch(err => {
@@ -122,6 +136,7 @@ const ExcelTranslatorMain = (props) => {
                     .then(res => {
                         if (res.status === 200 && res.data && res.data.message === 'success') {
                             alert('저장되었습니다.');
+                            this.searchExcelTranslatorHeader();
                         }
                     })
                     .catch(err => {
@@ -168,6 +183,9 @@ const ExcelTranslatorMain = (props) => {
                     },
                     modify: async function (headerTitle) {
                         await __handleDataConnect().modifyTranslatorHeaderTitle(headerTitle);
+                    },
+                    delete: async function (headerId) {
+                        await __handleDataConnect().deleteTranslatorHeaderTitle(headerId);
                     }
                 }
             },
@@ -268,9 +286,11 @@ const ExcelTranslatorMain = (props) => {
                 {/* 엑셀 변환기 컨트롤 바 */}
                 <ExcelTranslatorControlBar
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
+                    uploadedExcelData={uploadedExcelData}
 
                     createTranslatorHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().submit(headerTitle)}
                     modifyTranslatorHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().modify(headerTitle)}
+                    deleteTranslatorHeaderTitleControl={(headerId) => __handleEventControl().translatorHeaderTitle().delete(headerId)}
                     uploadExcelFileControl={(uploadedFormData) => __handleEventControl().uploadExcelData().submit(uploadedFormData)}
                     downloadTranslatedExcelFileControl={(downloadHeaderDetail) => __handleEventControl().downloadTranslatedExcelFile().submit(downloadHeaderDetail)}
                     resetUploadExcelFileControl={() => __handleEventControl().uploadExcelData().reset()}

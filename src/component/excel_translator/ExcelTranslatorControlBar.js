@@ -9,6 +9,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import ClearIcon from '@mui/icons-material/Clear';
 import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
 
 import BackdropLoading from '../excel_translator/loading/BackdropLoading';
@@ -21,13 +22,14 @@ const Container = styled.div`
 
 const TitleSelector = styled.div`
     display: grid;
-    grid-template-columns: 50% 10%;
+    grid-template-columns: 50% auto;
     padding: 20px 0px;
     text-align: center;
     align-items: center;
 
     @media only screen and (max-width: 992px) {
-        grid-template-columns: 70% 10%;
+        padding: 20px 30px;
+        grid-template-columns: 50% auto;
         place-content: center;
     }
 `;
@@ -53,6 +55,10 @@ const StorageControlBtn = styled.button`
     &:hover {
         opacity: 0.8;
         cursor: pointer;
+    }
+
+    @media only screen and (max-width: 992px) {
+        padding: 6px;
     }
 `;
 
@@ -165,6 +171,11 @@ const Input = styled.input`
 
 const TitleControlBox = styled.div`
     display: flex;
+`;
+
+const DeleteBtn = styled.div`
+    width: auto;
+    float: right;
 `;
 
 class ExcelTranslatorHeader {
@@ -351,6 +362,15 @@ const ExcelTranslatorControlBar = (props) => {
                     })}`
                 })
             },
+            delete: async function (e) {
+                e.preventDefault();
+
+                await props.deleteTranslatorHeaderTitleControl(selectedHeaderTitleState.id);
+
+                props.history.replace({
+                    pathname: pathname
+                })
+            }
         }
     }
 
@@ -390,12 +410,23 @@ const ExcelTranslatorControlBar = (props) => {
                     downloadTranslatedExcelFile: async function (e) {
                         e.preventDefault();
 
+                        if(!props.uploadedExcelData) {
+                            alert('엑셀 파일을 먼저 업로드 해주세요.');
+                            return;
+                        }else if(!(selectedHeaderTitleState.uploadHeaderDetail.details.length > 0)) {
+                            alert('업로드 엑셀 양식을 설정해주세요.');
+                            return;
+                        }else if(!(selectedHeaderTitleState.downloadHeaderDetail.details.length > 0)) {
+                            alert('다운로드 엑셀 양식을 설정해주세요.');
+                            return;
+                        }
+
                         loadingControl().open();
                         await props.downloadTranslatedExcelFileControl(selectedHeaderTitleState.downloadHeaderDetail.details);
                         loadingControl().close();
                     }
                 }
-            },
+            }
         }
     }
 
@@ -444,6 +475,7 @@ const ExcelTranslatorControlBar = (props) => {
                             <TitleControlBox>
                                 <StorageControlBtn type="button" onClick={() => onCreateTranslatorHeaderTitleModalOpen()}><AddIcon /></StorageControlBtn>
                                 <StorageControlBtn type="button" onClick={() => onModifyTranslatorHeaderTitleModalOpen()}><EditIcon /></StorageControlBtn>
+                                <StorageControlBtn type="button" onClick={(e) => excelTranslatorHeaderControl().delete(e)}><ClearIcon /></StorageControlBtn>
                             </TitleControlBox>
                         </TitleSelector>
                         <FromGroup>

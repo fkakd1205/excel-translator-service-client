@@ -46,6 +46,7 @@ const BoardContainer = styled.div`
     overflow: auto;
     border-radius: 5px;
     font-size: 14px;
+    box-shadow: 1px 1px 15px #a9b3d599;
 
     & .fixed-header {
         position: sticky;
@@ -111,6 +112,9 @@ const StoreBtn = styled.button`
 
     &:hover{
         cursor: pointer;
+        transition: 0.2s;
+        transform: scale(1.05);
+        background: rgb(160 180 200);
     }
 
     &:active{
@@ -144,6 +148,14 @@ const selectedHeaderTitleStateReducer = (state, action) => {
     switch (action.type) {
         case 'INIT_DATA':
             return action.payload;
+        case 'SET_UPLOAD_HEADER_DETAIL_DATA':
+            return {
+                ...state,
+                uploadHeaderDetail: {
+                    ...state.downloadHeaderDetail,
+                    details: action.payload
+                }
+            }
         case 'CLEAR':
             return null;
         default: return { ...state }
@@ -157,6 +169,7 @@ const ExcelTranslatorUploadDataBoard = (props) => {
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
     const [uploadedExcelHeaderData, setUploadedExcelHeaderData] = useState(null);
     const [uploadedExcelData, setUploadedExcelData] = useState(null);
+    const [excelHeader, setExcelHeader] = useState(null);
 
     useEffect(() => {
         function initHeaderTitleState() {
@@ -200,19 +213,26 @@ const ExcelTranslatorUploadDataBoard = (props) => {
             return ;
         }
 
-        if (props.uploadedExcelData) {
-            setUploadedExcelHeaderData(props.uploadedExcelData[0].uploadedData.details);
-            return ;
-        }
-    }, [selectedHeaderTitleState, props.uploadedExcelData]);
-
-    useEffect(() => {
         if(!props.uploadedExcelData) {
             return;
         }
-        // 헤더 데이터를 제외한 데이터
+
+        // 헤더 데이터 설정
+        setUploadedExcelHeaderData(props.uploadedExcelData[0].uploadedData.details);
+    }, [selectedHeaderTitleState, props.uploadedExcelData]);
+
+    useEffect(() => {
+        if (!selectedHeaderTitleState) {
+            return;
+        }
+        
+        if(!props.uploadedExcelData) {
+            return;
+        }
+
+        // 헤더 데이터를 제외한 데이터 설정
         setUploadedExcelData(props.uploadedExcelData?.filter((r, idx) => idx !== 0));
-    }, [props.uploadedExcelData]);
+    }, [selectedHeaderTitleState, props.uploadedExcelData]);
 
     const onCreateTranslatorUploadHeaderDetailModalOpen = () => {
         setCreateTranslatorUploadHeaderDetailModalOpen(true);
@@ -261,14 +281,22 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                             };
 
                             return data;
-                        })
+                        });
 
                         let excelHeader = {
-                            ...selectedHeaderTitleState.uploadHeaderDetail,
-                            details: uploadDetails
+                            ...selectedHeaderTitleState,
+                            uploadHeaderDetail: {
+                                ...selectedHeaderTitleState.uploadHeaderDetail,
+                                details: uploadDetails
+                            }
                         };
 
-                        await props.createUploadHeaderDetailsControl(excelHeader)
+                        dispatchSelectedHeaderTitleState({
+                            type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
+                            payload: uploadDetails
+                        });
+
+                        await props.createUploadHeaderDetailsControl(excelHeader);
                         onCreateTranslatorUploadHeaderDetailModalClose();
                     }
                 }
@@ -298,7 +326,7 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                                 })}
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style={{ border: 'none' }}>
                             {uploadedExcelData?.map((data, idx) => {
                                 return (
                                     <BodyTr

@@ -45,6 +45,7 @@ const BoardContainer = styled.div`
     border-radius: 5px;
     font-size: 14px;
     overflow: auto;
+    box-shadow: 1px 1px 15px #a9b3d599;
 
     & .fixed-header {
         position: sticky;
@@ -99,6 +100,9 @@ const StoreBtn = styled.button`
 
     &:hover{
         cursor: pointer;
+        transition: 0.2s;
+        transform: scale(1.05);
+        background: rgb(160 180 200);
     }
 
     &:active{
