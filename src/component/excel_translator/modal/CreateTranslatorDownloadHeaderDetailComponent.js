@@ -48,7 +48,7 @@ const GroupTitle = styled.div`
 
 const BodyContainer = styled.div`
     padding: 10px;
-    max-height: 450px;
+    max-height: 600px;
     overflow-y: auto;
     overflow-x: hidden;
 `;

@@ -28,8 +28,9 @@ const TitleSelector = styled.div`
     align-items: center;
 
     @media only screen and (max-width: 992px) {
-        padding: 20px 30px;
-        grid-template-columns: 50% auto;
+        padding: 10px;
+        grid-template-columns: 100%;
+        row-gap: 20px;
         place-content: center;
     }
 `;
@@ -41,10 +42,11 @@ const FormInput = styled.div`
 
     @media only screen and (max-width: 992px) {
         font-size: 10px;
+        grid-row: end;
     }
 `;
 
-const StorageControlBtn = styled.button`
+const TitleControlBtn = styled.button`
     background: #989fb7;
     color:white;
     border:1px solid #989fb7;
@@ -120,7 +122,7 @@ const ControlLabel = styled.label`
     }
 
     @media only screen and (max-width:992px){
-        padding: 2% 0%;
+        padding: 1.5% 0%;
     }
 
     @media only screen and (max-width:768px){
@@ -151,7 +153,7 @@ const ControlBtn = styled.button`
     }
 
     @media only screen and (max-width:992px){
-        padding: 2% 0%;
+        padding: 1.5% 0%;
     }
 
     @media only screen and (max-width:768px){
@@ -171,6 +173,10 @@ const Input = styled.input`
 
 const TitleControlBox = styled.div`
     display: flex;
+
+    @media only screen and (max-width: 992px) {
+        justify-content: flex-end;
+    }
 `;
 
 const DeleteBtn = styled.div`
@@ -473,9 +479,9 @@ const ExcelTranslatorControlBar = (props) => {
                                 </div>
                             </FormInput>
                             <TitleControlBox>
-                                <StorageControlBtn type="button" onClick={() => onCreateTranslatorHeaderTitleModalOpen()}><AddIcon /></StorageControlBtn>
-                                <StorageControlBtn type="button" onClick={() => onModifyTranslatorHeaderTitleModalOpen()}><EditIcon /></StorageControlBtn>
-                                <StorageControlBtn type="button" onClick={(e) => excelTranslatorHeaderControl().delete(e)}><ClearIcon /></StorageControlBtn>
+                                <TitleControlBtn type="button" onClick={() => onCreateTranslatorHeaderTitleModalOpen()}><AddIcon /></TitleControlBtn>
+                                <TitleControlBtn type="button" onClick={() => onModifyTranslatorHeaderTitleModalOpen()}><EditIcon /></TitleControlBtn>
+                                <TitleControlBtn type="button" onClick={(e) => excelTranslatorHeaderControl().delete(e)}><ClearIcon /></TitleControlBtn>
                             </TitleControlBox>
                         </TitleSelector>
                         <FromGroup>

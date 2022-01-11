@@ -91,7 +91,7 @@ const StoreBtn = styled.button`
 
     @media only screen and (max-width: 992px){
         display: inline-block;
-        padding: 5px;
+        padding: 4px;
     }
 
     @media only screen and (max-width:576px ){
