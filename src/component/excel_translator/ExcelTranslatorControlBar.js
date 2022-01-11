@@ -113,7 +113,7 @@ const ControlLabel = styled.label`
     vertical-align: middle;
     background-color: #a9b3d5;
     border-radius: 3px;
-    transition: opacity 0.1s linear;
+    transition: 0.15s linear;
     font-weight: 600;
 
     &:hover {
@@ -144,7 +144,7 @@ const ControlBtn = styled.button`
     background-color: #a9b3d5;
     border-radius: 3px;
     border: none;
-    transition: opacity 0.1s linear;
+    transition: 0.15s linear;
     font-weight: 600;
 
     &:hover {

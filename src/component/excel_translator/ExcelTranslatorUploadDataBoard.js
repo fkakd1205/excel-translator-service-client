@@ -169,7 +169,6 @@ const ExcelTranslatorUploadDataBoard = (props) => {
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
     const [uploadedExcelHeaderData, setUploadedExcelHeaderData] = useState(null);
     const [uploadedExcelData, setUploadedExcelData] = useState(null);
-    const [excelHeader, setExcelHeader] = useState(null);
 
     useEffect(() => {
         function initHeaderTitleState() {
@@ -177,15 +176,12 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                 return;
             }
 
-            if(!params.headerId) {
-                dispatchSelectedHeaderTitleState({
-                    type: 'CLEAR'
-                });
-                return;
-            }
-
             setUploadedExcelHeaderData(null);
             setUploadedExcelData(null);
+
+            dispatchSelectedHeaderTitleState({
+                type: 'CLEAR'
+            });
             
             let headerId = params.headerId;
             let headerTitleState = props.excelTranslatorHeaderList?.filter(r => r.id === headerId)[0];
@@ -214,6 +210,7 @@ const ExcelTranslatorUploadDataBoard = (props) => {
         }
 
         if(!props.uploadedExcelData) {
+            setUploadedExcelHeaderData(null);
             return;
         }
 
@@ -227,6 +224,7 @@ const ExcelTranslatorUploadDataBoard = (props) => {
         }
         
         if(!props.uploadedExcelData) {
+            setUploadedExcelData(null);
             return;
         }
 

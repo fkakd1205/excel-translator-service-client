@@ -59,6 +59,7 @@ const DataWrapper = styled.div`
     padding: 10px 16px 30px 16px;
     height: auto;
     background-color: #e8ecf7;
+    transition: 1.2s;
 
     & .arrow-img {
         display: flex;
