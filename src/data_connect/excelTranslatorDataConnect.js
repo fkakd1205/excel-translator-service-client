@@ -48,7 +48,7 @@ const excelTranslatorDataConnect = () => {
                 responseType: 'blob',
                 withCredentials:true
             })
-        },
+        }
     }
 }
 

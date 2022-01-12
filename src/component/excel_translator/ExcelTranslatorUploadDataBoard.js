@@ -123,6 +123,37 @@ const StoreBtn = styled.button`
     }
 `;
 
+const DeleteBtn = styled.button`
+    padding: 3%;
+    background: rgb(255 206 154);
+    color:white;
+    font-size: 1em;
+    font-weight: 500;
+    border:1px solid rgb(255 206 154);
+    border-radius: 20px;
+    
+    @media only screen and (max-width: 992px){
+        display: inline-block;
+        padding: 4px;
+    }
+
+    @media only screen and (max-width:576px ){
+        padding: 0;
+    }
+
+    &:hover{
+        cursor: pointer;
+        transition: 0.2s;
+        transform: scale(1.05);
+        background: rgb(255 172 139);
+    }
+
+    &:active{
+        transition: 0s;
+        transform: scale(1.05);
+    }
+`;
+
 class UploadHeaderDetail {
     constructor() {
         this.id = uuidv4();
@@ -152,7 +183,7 @@ const selectedHeaderTitleStateReducer = (state, action) => {
             return {
                 ...state,
                 uploadHeaderDetail: {
-                    ...state.downloadHeaderDetail,
+                    ...state.uploadHeaderDetail,
                     details: action.payload
                 }
             }
@@ -253,7 +284,8 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                         } else if (selectedHeaderTitleState.uploadHeaderDetail.details.length > 0) {
                             alert('이미 설정된 양식이 존재합니다.');
                             return;
-                        } else if (!props.uploadedExcelData) {
+                        }
+                        else if (!props.uploadedExcelData) {
                             alert('저장하려는 양식의 엑셀 파일을 먼저 업로드해주세요.');
                             return;
                         }
@@ -296,7 +328,20 @@ const ExcelTranslatorUploadDataBoard = (props) => {
 
                         await props.createUploadHeaderDetailsControl(excelHeader);
                         onCreateTranslatorUploadHeaderDetailModalClose();
+                    },
+                    delete: async function (e) {
+                        e.preventDefault();
+
+                        let excelHeader = {
+                            ...selectedHeaderTitleState,
+                            uploadHeaderDetail: {
+                                details: []
+                            }
+                        };
+
+                        await props.createUploadHeaderDetailsControl(excelHeader);
                     }
+
                 }
             }
         }
@@ -308,7 +353,12 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                 <BoardTitle>
                     <span>업로드 엑셀 헤더 및 데이터</span>
                     <DataOptionBox>
-                        <StoreBtn type="button" onClick={(e) => excelFormControl().uploadedExcelForm().open(e)}>양식 저장</StoreBtn>
+                        {selectedHeaderTitleState &&
+                            <>
+                                <StoreBtn hidden={selectedHeaderTitleState?.uploadHeaderDetail.details.length > 0 ? true : false} type="button" onClick={(e) => excelFormControl().uploadedExcelForm().open(e)}>양식 저장</StoreBtn>
+                                <DeleteBtn hidden={selectedHeaderTitleState?.uploadHeaderDetail.details.length > 0 ? false : true} type="button" onClick={(e) => excelFormControl().uploadedExcelForm().delete(e)}>양식 삭제</DeleteBtn>
+                            </>
+                        }
                     </DataOptionBox>
                 </BoardTitle>
                 <BoardContainer>
