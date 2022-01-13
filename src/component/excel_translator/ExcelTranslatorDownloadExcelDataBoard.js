@@ -280,11 +280,12 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                     },
                     createDownloadExcelHeaderDetail: async function (e) {
                         e.preventDefault();
+
                         await props.createDownloadHeaderDetailsControl(updateDownloadHeaderForm);
                         
                         dispatchSelectedHeaderTitleState({
                             type: 'INIT_DATA',
-                            payload: updateDownloadHeaderForm  
+                            payload: updateDownloadHeaderForm
                         })
                         
                         onCreateTranslatorDownloadHeaderDetailModalClose();
@@ -292,7 +293,7 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                     selectedUploadHeaderName: function (e, downloadHeaderId) {
                         e.preventDefault();
 
-                        let newDetails = updateDownloadHeaderForm.downloadHeaderDetail.details.map(r=>{
+                        let newDetails = updateDownloadHeaderForm.downloadHeaderDetail.details.map(r => {
                             if(r.id === downloadHeaderId){
                                 let uploadHeaderId = updateDownloadHeaderForm.uploadHeaderDetail.details.filter(uploadHeader => uploadHeader.cellNumber === e.target.value)[0].id;
 

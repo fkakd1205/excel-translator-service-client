@@ -72,7 +72,6 @@ const ExcelTranslatorMain = (props) => {
                         if (res.status === 200 && res.data && res.data.message === 'success') {
                             alert('저장되었습니다.');
                             this.searchExcelTranslatorHeader();
-                            
                         }
                     })
                     .catch(err => {
@@ -99,7 +98,6 @@ const ExcelTranslatorMain = (props) => {
                         if (res.status === 200 && res.data && res.data.message === 'success') {
                             alert('삭제되었습니다.');
                             this.searchExcelTranslatorHeader();
-                            setUploadedExcelData(null);
                         }
                     })
                     .catch(err => {

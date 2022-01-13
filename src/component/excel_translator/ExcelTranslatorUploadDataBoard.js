@@ -179,6 +179,8 @@ class UploadHeaderDetail {
 
 const initialSelectedHeaderTitleState = null;
 const initialCreateUploadHeaderDetailState = null;
+const initialUploadExcelHeaderDataState = null;
+const initialUploadExcelDataState = null;
 
 const selectedHeaderTitleStateReducer = (state, action) => {
     switch (action.type) {
@@ -216,14 +218,35 @@ const createUploadHeaderDetailStateReducer = (state, action) => {
     }
 }
 
+const uploadExcelHeaderDataStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        case 'CLEAR':
+            return null;
+        default: return { ...state }
+    }
+}
+
+const uploadExcelDataStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        case 'CLEAR':
+            return null;
+        default: return { ...state }
+    }
+}
+
 const ExcelTranslatorUploadDataBoard = (props) => {
     let params = queryString.parse(props.location.search);
 
     const [createTranslatorUploadHeaderDetailModalOpen, setCreateTranslatorUploadHeaderDetailModalOpen] = useState(false);
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
     const [createUploadHeaderDetailState, dispatchCreateUploadHeaderDetailState] = useReducer(createUploadHeaderDetailStateReducer, initialCreateUploadHeaderDetailState);
-    const [uploadedExcelHeaderData, setUploadedExcelHeaderData] = useState(null);
-    const [uploadedExcelData, setUploadedExcelData] = useState(null);
+    const [uploadedExcelHeaderDataState, dispatchUploadedExcelHeaderDataState] = useReducer(uploadExcelHeaderDataStateReducer, initialUploadExcelHeaderDataState);
+    const [uploadedExcelDataState, dispatchUploadedExcelDataState] = useReducer(uploadExcelDataStateReducer, initialUploadExcelDataState);
+
 
     useEffect(() => {
         function initHeaderTitleState() {
@@ -231,12 +254,25 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                 return;
             }
 
-            setUploadedExcelHeaderData(null);
-            setUploadedExcelData(null);
+            if(!params.headerId) {
+                dispatchSelectedHeaderTitleState({
+                    type: 'CLEAR'
+                });
+                dispatchUploadedExcelHeaderDataState({
+                    type: 'CLEAR'
+                });
+                dispatchUploadedExcelDataState({
+                    type: 'CLEAR'
+                })
+                return;
+            }
 
-            dispatchSelectedHeaderTitleState({
+            dispatchUploadedExcelHeaderDataState({
                 type: 'CLEAR'
             });
+            dispatchUploadedExcelDataState({
+                type: 'CLEAR'
+            })
             
             let headerId = params.headerId;
             let headerTitleState = props.excelTranslatorHeaderList?.filter(r => r.id === headerId)[0];
@@ -255,36 +291,44 @@ const ExcelTranslatorUploadDataBoard = (props) => {
         }
 
         if (selectedHeaderTitleState?.uploadHeaderDetail.details.length) {
-            setUploadedExcelHeaderData(selectedHeaderTitleState.uploadHeaderDetail.details.map(r => {
-                return {
-                    ...r,
-                    colData: r.headerName
-                }
-            }));
-            return ;
+            let data = selectedHeaderTitleState.uploadHeaderDetail.details.map(r => {
+                    return {
+                        ...r,
+                        colData: r.headerName
+                    }
+                });
+            dispatchUploadedExcelHeaderDataState({
+                type: 'INIT_DATA',
+                payload: data
+            });
+            return;
         }
 
         if(!props.uploadedExcelData) {
-            setUploadedExcelHeaderData(null);
             return;
         }
 
         // 헤더 데이터 설정
-        setUploadedExcelHeaderData(props.uploadedExcelData[0].uploadedData.details);
+        dispatchUploadedExcelHeaderDataState({
+            type: 'INIT_DATA',
+            payload: props.uploadedExcelData[0].uploadedData.details
+        });
     }, [selectedHeaderTitleState, props.uploadedExcelData]);
 
     useEffect(() => {
-        if (!selectedHeaderTitleState) {
+        if(!selectedHeaderTitleState) {
             return;
         }
         
         if(!props.uploadedExcelData) {
-            setUploadedExcelData(null);
             return;
         }
 
         // 헤더 데이터를 제외한 데이터 설정
-        setUploadedExcelData(props.uploadedExcelData?.filter((r, idx) => idx !== 0));
+        dispatchUploadedExcelDataState({
+            type: 'INIT_DATA',
+            payload: props.uploadedExcelData?.filter((r, idx) => idx !== 0)
+        });
     }, [selectedHeaderTitleState, props.uploadedExcelData]);
 
     const onCreateTranslatorUploadHeaderDetailModalOpen = () => {
@@ -306,17 +350,10 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                             alert('헤더 형식을 먼저 선택해주세요.');
                             return;
                         }
-                        // else if (selectedHeaderTitleState.uploadHeaderDetail.details.length > 0) {
-                        //     alert('이미 설정된 양식이 존재합니다.');
-                        //     return;
-                        // }
-                        // else if (!props.uploadedExcelData) {
-                        //     alert('저장하려는 양식의 엑셀 파일을 먼저 업로드해주세요.');
-                        //     return;
-                        // }
 
                         onCreateTranslatorUploadHeaderDetailModalOpen();
 
+                        // 이미 등록된 헤더 양식이 있는 경우
                         if(selectedHeaderTitleState?.uploadHeaderDetail.details.length > 0) {
                             let createHeaderData = {
                                 uploadedData: {
@@ -328,12 +365,12 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                                 type: 'INIT_DATA',
                                 payload: createHeaderData
                             });
-                        }else if(props.uploadedExcelData) {
+                        }else if(props.uploadedExcelData) {     // 업로드된 엑셀 파일이 있는 경우
                             dispatchCreateUploadHeaderDetailState({
                                 type: 'INIT_DATA',
                                 payload: props.uploadedExcelData[0]
                             });
-                        }else {
+                        }else {     // 새로운 양식을 만들 경우
                             let createHeaderData = {
                                 id: uuidv4(),
                                 uploadedData : {
@@ -385,19 +422,8 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                         });
 
                         await props.createUploadHeaderDetailsControl(excelHeader);
+
                         onCreateTranslatorUploadHeaderDetailModalClose();
-                    },
-                    delete: async function (e) {
-                        e.preventDefault();
-
-                        let excelHeader = {
-                            ...selectedHeaderTitleState,
-                            uploadHeaderDetail: {
-                                details: []
-                            }
-                        };
-
-                        await props.createUploadHeaderDetailsControl(excelHeader);
                     },
                     onChangeInputValue: function (e, detailId) {
                         e.preventDefault();
@@ -423,16 +449,12 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                     deleteCell: function (e, uploadHeaderId) {
                         e.preventDefault();
 
-                        // if(createUploadHeaderDetailState?.uploadedData.details.length > 1) {
-                            let newDetails = createUploadHeaderDetailState.uploadedData.details.filter(r=> r.id !== uploadHeaderId);
-                            
-                            dispatchCreateUploadHeaderDetailState({
-                                type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
-                                payload: newDetails
-                            });
-                        // } else{
-                        //     alert('삭제할 수 없습니다.');
-                        // }
+                        let newDetails = createUploadHeaderDetailState.uploadedData.details.filter(r => r.id !== uploadHeaderId);
+
+                        dispatchCreateUploadHeaderDetailState({
+                            type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
+                            payload: newDetails
+                        });
                     },
                     addCell: function (e) {
                         e.preventDefault();
@@ -509,7 +531,8 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                     <table className="table table-sm" style={{ tableLayout: 'fixed', width: '100%' }}>
                         <thead>
                             <tr>
-                                {uploadedExcelHeaderData?.map((data, idx) => {
+                                {/* {uploadedExcelHeaderData?.map((data, idx) => { */}
+                                {uploadedExcelHeaderDataState?.map((data, idx) => {
                                     return (
                                         <HeaderTh key={'upload_header_idx' + idx} className="fixed-header large-cell" scope="col">
                                             <span>{data.colData}</span>
@@ -519,7 +542,7 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                             </tr>
                         </thead>
                         <tbody style={{ border: 'none' }}>
-                            {uploadedExcelData?.map((data, idx) => {
+                            {uploadedExcelDataState?.map((data, idx) => {
                                 return (
                                     <BodyTr
                                         key={'upload_exel_data_idx' + idx}
@@ -547,7 +570,6 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                 fullWidth={true}
             >
                 <CreateTranslatorUploadHeaderDetailComponent
-                    uploadedExcelDataHeader={props.uploadedExcelData}
                     createUploadHeaderDetailState={createUploadHeaderDetailState}
                     selectedHeaderTitleState={selectedHeaderTitleState}
 

@@ -286,8 +286,13 @@ const ExcelTranslatorControlBar = (props) => {
     }
 
     const onModifyTranslatorHeaderTitleModalOpen = () => {
+        if(!selectedHeaderTitleState){
+            alert('엑셀 형식을 먼저 선택해주세요.');
+            return;
+        }
+
         setModifyTranslatorHeaderTitleModalOpen(true);
-        
+
         dispatchExcelTitleInfo({
             type: 'INIT_DATA',
             payload: {
@@ -370,6 +375,11 @@ const ExcelTranslatorControlBar = (props) => {
             },
             delete: async function (e) {
                 e.preventDefault();
+
+                if(!selectedHeaderTitleState) {
+                    alert('삭제하려는 엑셀 형식을 먼저 선택해주세요.');
+                    return;
+                }
 
                 await props.deleteTranslatorHeaderTitleControl(selectedHeaderTitleState.id);
 

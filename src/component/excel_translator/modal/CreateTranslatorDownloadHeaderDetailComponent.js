@@ -51,6 +51,7 @@ const BodyContainer = styled.div`
     max-height: 600px;
     overflow-y: auto;
     overflow-x: hidden;
+    background-color: #c1c7d7;
 `;
 
 const DataWrapper = styled.div`
@@ -59,7 +60,6 @@ const DataWrapper = styled.div`
     padding: 10px 16px 30px 16px;
     height: auto;
     background-color: #e8ecf7;
-    transition: 1.2s;
 
     & .arrow-img {
         display: flex;
@@ -224,6 +224,14 @@ const CreateBtn = styled.button`
     }
 `;
 
+const DataContainer = styled.div`
+    height: 60vh;
+    overflow: auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+`;
+
 const CreateTranslatorDownloadHeaderDetailComponent = (props) => {
 
     // 다운로드 엑셀 헤더의 targetCellNumber에 대응하는 업로드 엑셀의 헤더명을 찾는다.
@@ -245,67 +253,70 @@ const CreateTranslatorDownloadHeaderDetailComponent = (props) => {
                         </ItemWrapper>
                     </ItemContainer>
                     <BodyContainer>
-                        {props.updateDownloadHeaderForm?.downloadHeaderDetail?.details.map((downloadHeader, idx) => {
-                            return (
-                                <React.Fragment key={downloadHeader.id}>
-                                    <DataWrapper>
-                                        <DeleteBox>
-                                            <DeleteBtn><CancelIcon type="button" sx={{ fontSize: 33 }} onClick={(e) => props.downloadExcelFormControl().deleteCell(e, downloadHeader.id)} /></DeleteBtn>
-                                        </DeleteBox>
-                                        <DataGroup>
-                                            <UploadDataGroup>
-                                                <div>{idx + 1}.</div>
-                                                <FormInput>
-                                                    <div style={{ width: '100%' }}>
-                                                        <Box sx={{ display: 'flex' }}>
-                                                            <FormControl fullWidth>
-                                                                <InputLabel id="header-select-id" size="small">Title</InputLabel>
-                                                                <Select
-                                                                    labelId="header-select-id"
-                                                                    id="header-select"
-                                                                    label="header-selector"
-                                                                    value={downloadHeader.targetCellNumber === -1 ? '고정값' : getUploadHeaderName(downloadHeader.targetCellNumber)}
-                                                                    sx={{ height: 40 }}
-                                                                    onChange={(e)=>props.selectedUploadHeaderNameControl(e, downloadHeader.id)}
-                                                                >
-                                                                    {props.updateDownloadHeaderForm?.uploadHeaderDetail?.details.map((headerTitle, idx2) => {
-                                                                        return (
-                                                                            <MenuItem key={'excel_translator_upload_header_name' + idx2} value={parseInt(headerTitle.cellNumber)}
-                                                                            >{headerTitle.headerName}</MenuItem>
-                                                                        )
-                                                                    })}
-                                                                    <MenuItem value={'고정값'} disabled>고정값</MenuItem>
-                                                                </Select>
-                                                            </FormControl>
-                                                        </Box>
-                                                    </div>
-                                                </FormInput>
-                                            </UploadDataGroup>
-                                            <ArrowSpan className="arrow-img"><ArrowForwardIosIcon /></ArrowSpan>
-                                            <DownloadInfo>
-                                                <DownloadDataGroup>
-                                                    <div>설정 헤더명<i className="icon-must" aria-label="필수항목"></i></div>
-                                                    <DataInputEl type="text" name='headerName' placeholder='다운로드 엑셀 항목명' onChange={(e) => props.onChangeInputValueControl(e, downloadHeader.id)} value={downloadHeader.headerName} required></DataInputEl>
-                                                </DownloadDataGroup>
-                                                <DownloadDataGroup>
-                                                    <div>고정값 여부</div>
-                                                    <div>
-                                                        <Checkbox
-                                                            onClick={(e) => props.downloadExcelFormControl().checkOne(e, downloadHeader.id)}
-                                                            checked={props.downloadExcelFormControl().isChecked(downloadHeader.id)}
-                                                        />
-                                                    </div>
-                                                </DownloadDataGroup>
-                                                <DownloadDataGroup>
-                                                    <div>고정값</div>
-                                                    <DataInputEl type="text" name='fixedValue' placeholder='엑셀 고정 값' onChange={(e) => props.onChangeInputValueControl(e, downloadHeader.id)} disabled={!props.downloadExcelFormControl().isChecked(downloadHeader.id)} value={downloadHeader.fixedValue}></DataInputEl>
-                                                </DownloadDataGroup>
-                                            </DownloadInfo>
-                                        </DataGroup>
-                                    </DataWrapper>
-                                </React.Fragment>
-                            );
-                        })}
+                        <DataContainer>
+                            {props.updateDownloadHeaderForm?.downloadHeaderDetail?.details.map((downloadHeader, idx) => {
+                                return (
+                                    <React.Fragment key={downloadHeader.id}>
+                                        <DataWrapper>
+                                            <DeleteBox>
+                                                <DeleteBtn><CancelIcon type="button" sx={{ fontSize: 33 }} onClick={(e) => props.downloadExcelFormControl().deleteCell(e, downloadHeader.id)} /></DeleteBtn>
+                                            </DeleteBox>
+                                            <DataGroup>
+                                                <UploadDataGroup>
+                                                    <div>{idx + 1}.</div>
+                                                    <FormInput>
+                                                        <div style={{ width: '100%' }}>
+                                                            <Box sx={{ display: 'flex' }}>
+                                                                <FormControl fullWidth>
+                                                                    <InputLabel id="header-select-id" size="small">Title</InputLabel>
+                                                                    <Select
+                                                                        labelId="header-select-id"
+                                                                        id="header-select"
+                                                                        label="header-selector"
+                                                                        value={props.downloadExcelFormControl().isChecked(downloadHeader.id) || downloadHeader.targetCellNumber === -1 ? '고정값' : getUploadHeaderName(downloadHeader.targetCellNumber)}
+                                                                        sx={{ height: 40 }}
+                                                                        onChange={(e) => props.selectedUploadHeaderNameControl(e, downloadHeader.id)}
+                                                                        disabled={props.downloadExcelFormControl().isChecked(downloadHeader.id)}
+                                                                    >
+                                                                        {props.updateDownloadHeaderForm?.uploadHeaderDetail?.details.map((headerTitle, idx2) => {
+                                                                            return (
+                                                                                <MenuItem key={'excel_translator_upload_header_name' + idx2} value={parseInt(headerTitle.cellNumber)}
+                                                                                >{headerTitle.headerName}</MenuItem>
+                                                                            )
+                                                                        })}
+                                                                        <MenuItem value={'고정값'} hidden>고정값</MenuItem>
+                                                                    </Select>
+                                                                </FormControl>
+                                                            </Box>
+                                                        </div>
+                                                    </FormInput>
+                                                </UploadDataGroup>
+                                                <ArrowSpan className="arrow-img"><ArrowForwardIosIcon /></ArrowSpan>
+                                                <DownloadInfo>
+                                                    <DownloadDataGroup>
+                                                        <div>설정 헤더명<i className="icon-must" aria-label="필수항목"></i></div>
+                                                        <DataInputEl type="text" name='headerName' placeholder='다운로드 엑셀 항목명' onChange={(e) => props.onChangeInputValueControl(e, downloadHeader.id)} value={downloadHeader.headerName} required></DataInputEl>
+                                                    </DownloadDataGroup>
+                                                    <DownloadDataGroup>
+                                                        <div>고정값 여부</div>
+                                                        <div>
+                                                            <Checkbox
+                                                                onClick={(e) => props.downloadExcelFormControl().checkOne(e, downloadHeader.id)}
+                                                                checked={props.downloadExcelFormControl().isChecked(downloadHeader.id)}
+                                                            />
+                                                        </div>
+                                                    </DownloadDataGroup>
+                                                    <DownloadDataGroup>
+                                                        <div>고정값</div>
+                                                        <DataInputEl type="text" name='fixedValue' placeholder='엑셀 고정 값' onChange={(e) => props.onChangeInputValueControl(e, downloadHeader.id)} disabled={!props.downloadExcelFormControl().isChecked(downloadHeader.id)} value={downloadHeader.fixedValue}></DataInputEl>
+                                                    </DownloadDataGroup>
+                                                </DownloadInfo>
+                                            </DataGroup>
+                                        </DataWrapper>
+                                    </React.Fragment>
+                                );
+                            })}
+                        </DataContainer>
                         <CustomDataGroup>
                             <AddCircleOutlineIcon type="button" sx={{ fontSize: 30 }}
                                 onClick={(e) => props.downloadExcelFormControl().addCell(e)}

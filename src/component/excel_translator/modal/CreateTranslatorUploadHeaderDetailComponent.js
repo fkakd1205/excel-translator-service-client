@@ -6,11 +6,9 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const Container = styled.div`
-    background-color: #e8ecf7;
 `;
 
 const ItemContainer = styled.div`
-
 `;
 
 const ItemWrapper = styled.div`
@@ -44,7 +42,7 @@ const DataText = styled.div`
     grid-template-columns: 1fr 1fr 5fr;
     padding: 2%;
     background-color: white;
-    border-radius: 5px;
+    border-radius: 30px;
     align-items: center;
 
     @media only screen and (max-width:425px){
@@ -53,22 +51,16 @@ const DataText = styled.div`
 `;
 
 const BodyContainer = styled.div`
-    padding: 10px;
+    padding: 5px;
     max-height: 400px;
     overflow: auto;
-`;
-
-const HeaderInfo = styled.div`
-    display: grid;
-    grid-template-columns: 1fr;
-    padding: 3px 10px;
-    text-align: center;
-    align-items: center;
+    background-color: #c1c7d7;
+    overflow-x: hidden;
 `;
 
 const CreateHeaderInfo = styled.div`
     display: grid;
-    grid-template-columns: 90% 10%;
+    grid-template-columns: 90% 5%;
     column-gap: 10px;
     padding: 3px 10px;
     text-align: center;
@@ -76,6 +68,11 @@ const CreateHeaderInfo = styled.div`
 `;
 
 const CreateContainer = styled.div`
+    background-color: #e8ecf7;
+    height: 40vh;
+    overflow: auto;
+    padding: 10px;
+    border-radius: 5px;
 `;
 
 const CreateBtn = styled.button`
@@ -210,12 +207,12 @@ const CreateTranslatorUploadHeaderDetailComponent = (props) => {
                                     </CreateHeaderInfo>
                                 )
                             })}
-                            <CustomDataGroup>
-                                <AddCircleOutlineIcon type="button" sx={{ fontSize: 30 }}
-                                    onClick={(e) => props.uploadHeaderFormAddCell(e)}
-                                />
-                            </CustomDataGroup>
                         </CreateContainer>
+                        <CustomDataGroup>
+                            <AddCircleOutlineIcon type="button" sx={{ fontSize: 30 }}
+                                onClick={(e) => props.uploadHeaderFormAddCell(e)}
+                            />
+                        </CustomDataGroup>
                     </BodyContainer>
                 </form>
             </Container>
