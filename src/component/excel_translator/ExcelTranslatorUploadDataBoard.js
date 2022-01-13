@@ -6,6 +6,7 @@ import { withRouter } from 'react-router';
 import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
 import { dateToYYMMDDhhmmss } from "./handler/dateHandler"
 import CreateTranslatorUploadHeaderDetailComponent from "./modal/CreateTranslatorUploadHeaderDetailComponent";
+import { isFocusable } from "@testing-library/user-event/dist/utils";
 
 const Container = styled.div`
     padding: 0 2%;
@@ -37,6 +38,40 @@ const DataOptionBox = styled.span`
     display: grid;
     grid-template-columns: 1fr;
     column-gap: 10px;
+
+    & .upload-header-create-btn {
+        background: #c0bff3;
+        border: 1px solid #c0bff3;
+
+        &:hover{
+            cursor: pointer;
+            transition: 0.2s;
+            transform: scale(1.05);
+            background: #a5a3ff;
+        }
+
+        &:active{
+            transition: 0s;
+            transform: scale(1.05);
+        }
+    }
+
+    & .upload-header-modify-btn {
+        background: rgb(255 206 154);
+        border: 1px solid rgb(255 206 154);
+
+        &:hover{
+            cursor: pointer;
+            transition: 0.2s;
+            transform: scale(1.05);
+            background: rgb(255 172 139);
+        }
+
+        &:active{
+            transition: 0s;
+            transform: scale(1.05);
+        }
+    }
 `;
 
 const BoardContainer = styled.div`
@@ -92,7 +127,7 @@ const BodyTd = styled.td`
     border-right: 1px solid #a7a7a720;
 `;
 
-const StoreBtn = styled.button`
+const HeaderFormControlBtn = styled.button`
     padding: 3%;
     background: rgb(179 199 219);
     color:white;
@@ -123,37 +158,6 @@ const StoreBtn = styled.button`
     }
 `;
 
-const DeleteBtn = styled.button`
-    padding: 3%;
-    background: rgb(255 206 154);
-    color:white;
-    font-size: 1em;
-    font-weight: 500;
-    border:1px solid rgb(255 206 154);
-    border-radius: 20px;
-    
-    @media only screen and (max-width: 992px){
-        display: inline-block;
-        padding: 4px;
-    }
-
-    @media only screen and (max-width:576px ){
-        padding: 0;
-    }
-
-    &:hover{
-        cursor: pointer;
-        transition: 0.2s;
-        transform: scale(1.05);
-        background: rgb(255 172 139);
-    }
-
-    &:active{
-        transition: 0s;
-        transform: scale(1.05);
-    }
-`;
-
 class UploadHeaderDetail {
     constructor() {
         this.id = uuidv4();
@@ -174,6 +178,7 @@ class UploadHeaderDetail {
 
 
 const initialSelectedHeaderTitleState = null;
+const initialCreateUploadHeaderDetailState = null;
 
 const selectedHeaderTitleStateReducer = (state, action) => {
     switch (action.type) {
@@ -193,11 +198,30 @@ const selectedHeaderTitleStateReducer = (state, action) => {
     }
 }
 
+const createUploadHeaderDetailStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INIT_DATA':
+            return action.payload;
+        case 'SET_UPLOAD_HEADER_DETAIL_DATA':
+            return {
+                ...state,
+                uploadedData: {
+                    ...state.uploadedData,
+                    details: action.payload
+                }
+            }
+        case 'CLEAR':
+            return null;
+        default: return { ...state }
+    }
+}
+
 const ExcelTranslatorUploadDataBoard = (props) => {
     let params = queryString.parse(props.location.search);
 
     const [createTranslatorUploadHeaderDetailModalOpen, setCreateTranslatorUploadHeaderDetailModalOpen] = useState(false);
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
+    const [createUploadHeaderDetailState, dispatchCreateUploadHeaderDetailState] = useReducer(createUploadHeaderDetailStateReducer, initialCreateUploadHeaderDetailState);
     const [uploadedExcelHeaderData, setUploadedExcelHeaderData] = useState(null);
     const [uploadedExcelData, setUploadedExcelData] = useState(null);
 
@@ -281,16 +305,51 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                         if (!selectedHeaderTitleState) {
                             alert('헤더 형식을 먼저 선택해주세요.');
                             return;
-                        } else if (selectedHeaderTitleState.uploadHeaderDetail.details.length > 0) {
-                            alert('이미 설정된 양식이 존재합니다.');
-                            return;
                         }
-                        else if (!props.uploadedExcelData) {
-                            alert('저장하려는 양식의 엑셀 파일을 먼저 업로드해주세요.');
-                            return;
-                        }
+                        // else if (selectedHeaderTitleState.uploadHeaderDetail.details.length > 0) {
+                        //     alert('이미 설정된 양식이 존재합니다.');
+                        //     return;
+                        // }
+                        // else if (!props.uploadedExcelData) {
+                        //     alert('저장하려는 양식의 엑셀 파일을 먼저 업로드해주세요.');
+                        //     return;
+                        // }
 
                         onCreateTranslatorUploadHeaderDetailModalOpen();
+
+                        if(selectedHeaderTitleState?.uploadHeaderDetail.details.length > 0) {
+                            let createHeaderData = {
+                                uploadedData: {
+                                    details : selectedHeaderTitleState?.uploadHeaderDetail.details
+                                }
+                            }
+
+                            dispatchCreateUploadHeaderDetailState({
+                                type: 'INIT_DATA',
+                                payload: createHeaderData
+                            });
+                        }else if(props.uploadedExcelData) {
+                            dispatchCreateUploadHeaderDetailState({
+                                type: 'INIT_DATA',
+                                payload: props.uploadedExcelData[0]
+                            });
+                        }else {
+                            let createHeaderData = {
+                                id: uuidv4(),
+                                uploadedData : {
+                                    details : [{
+                                        id: uuidv4(),
+                                        headerName: '',
+                                        cellType: 'String'
+                                    }]
+                                }
+                            }
+    
+                            dispatchCreateUploadHeaderDetailState({
+                                type: 'INIT_DATA',
+                                payload: createHeaderData
+                            })
+                        }
                     },
                     close: function () {
                         onCreateTranslatorUploadHeaderDetailModalClose()
@@ -298,15 +357,14 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                     storeUploadedExcelHeaderDetail: async function (e) {
                         e.preventDefault();
 
-                        // 업로드된 header 데이터
-                        let uploadedHeader = props.uploadedExcelData[0].uploadedData;
+                        let uploadedHeader = createUploadHeaderDetailState.uploadedData;
 
                         let uploadDetails = uploadedHeader.details.map((r, idx) => {
                             let data = new UploadHeaderDetail().toJSON();
                             data = {
                                 ...data,
                                 cellNumber: idx,
-                                headerName: r.colData,
+                                headerName: r.headerName || r.colData,
                                 cellType: r.cellType
                             };
 
@@ -340,8 +398,99 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                         };
 
                         await props.createUploadHeaderDetailsControl(excelHeader);
-                    }
+                    },
+                    onChangeInputValue: function (e, detailId) {
+                        e.preventDefault();
 
+                        let newDetails = createUploadHeaderDetailState?.uploadedData.details.map(r=>{
+                            if(r.id === detailId){
+                                return {
+                                    ...r,
+                                    [e.target.name] : e.target.value
+                                }
+                            }else{
+                                return {
+                                    ...r
+                                }
+                            }
+                        });
+
+                        dispatchCreateUploadHeaderDetailState({
+                            type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
+                            payload: newDetails
+                        });
+                    },
+                    deleteCell: function (e, uploadHeaderId) {
+                        e.preventDefault();
+
+                        // if(createUploadHeaderDetailState?.uploadedData.details.length > 1) {
+                            let newDetails = createUploadHeaderDetailState.uploadedData.details.filter(r=> r.id !== uploadHeaderId);
+                            
+                            dispatchCreateUploadHeaderDetailState({
+                                type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
+                                payload: newDetails
+                            });
+                        // } else{
+                        //     alert('삭제할 수 없습니다.');
+                        // }
+                    },
+                    addCell: function (e) {
+                        e.preventDefault();
+
+                        let newDetail = {
+                            id: uuidv4(),
+                            colData: '',
+                            cellType: 'String'
+                        }
+
+                        dispatchCreateUploadHeaderDetailState({
+                            type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
+                            payload: createUploadHeaderDetailState.uploadedData.details.concat(newDetail)
+                        });
+                    },
+                    moveUp: function (e, detailId) {
+                        e.preventDefault();
+
+                        let targetIdx = -1;
+
+                        createUploadHeaderDetailState.uploadedData.details.forEach((detail, idx) => {
+                            if(detail.id === detailId) {
+                                targetIdx = idx;
+                                return;
+                            }
+                        });
+                    
+                        this.changeArrayControl(targetIdx, parseInt(targetIdx)-1);
+                    },
+                    moveDown: function (e, detailId) {
+                        e.preventDefault();
+
+                        let targetIdx = -1;
+
+                        createUploadHeaderDetailState.uploadedData.details.forEach((detail, idx) => {
+                            if(detail.id === detailId) {
+                                targetIdx = idx;
+                                return;
+                            }
+                        });
+                    
+                        this.changeArrayControl(targetIdx, parseInt(targetIdx)+1);
+                    },
+                    changeArrayControl: function (targetIdx, moveValue) {
+                        if(!(createUploadHeaderDetailState.uploadedData.details.length > 1)) return;
+                        
+                        let newPosition = parseInt(moveValue);
+                        if(newPosition < 0 || newPosition >= createUploadHeaderDetailState.uploadedData.details.length) return;
+
+                        let headerDetailList = createUploadHeaderDetailState.uploadedData.details;
+                        let target = headerDetailList.splice(targetIdx, 1)[0];
+                        headerDetailList.splice(newPosition, 0, target);
+
+                        dispatchCreateUploadHeaderDetailState({
+                            type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
+                            payload: headerDetailList
+                        })
+                    }
                 }
             }
         }
@@ -353,12 +502,7 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                 <BoardTitle>
                     <span>업로드 엑셀 헤더 및 데이터</span>
                     <DataOptionBox>
-                        {selectedHeaderTitleState &&
-                            <>
-                                <StoreBtn hidden={selectedHeaderTitleState?.uploadHeaderDetail.details.length > 0 ? true : false} type="button" onClick={(e) => excelFormControl().uploadedExcelForm().open(e)}>양식 저장</StoreBtn>
-                                <DeleteBtn hidden={selectedHeaderTitleState?.uploadHeaderDetail.details.length > 0 ? false : true} type="button" onClick={(e) => excelFormControl().uploadedExcelForm().delete(e)}>양식 삭제</DeleteBtn>
-                            </>
-                        }
+                        <HeaderFormControlBtn type="button" onClick={(e) => excelFormControl().uploadedExcelForm().open(e)}>양식 설정</HeaderFormControlBtn>
                     </DataOptionBox>
                 </BoardTitle>
                 <BoardContainer>
@@ -404,8 +548,15 @@ const ExcelTranslatorUploadDataBoard = (props) => {
             >
                 <CreateTranslatorUploadHeaderDetailComponent
                     uploadedExcelDataHeader={props.uploadedExcelData}
+                    createUploadHeaderDetailState={createUploadHeaderDetailState}
+                    selectedHeaderTitleState={selectedHeaderTitleState}
 
                     storeUploadExcelFormControl={(e) => excelFormControl().uploadedExcelForm().storeUploadedExcelHeaderDetail(e)}
+                    onChangeUploadHeaderDetail={(e, detailId) => excelFormControl().uploadedExcelForm().onChangeInputValue(e, detailId)}
+                    uploadHeaderFormDeleteCell={(e, headerId) => excelFormControl().uploadedExcelForm().deleteCell(e, headerId)}
+                    uploadHeaderFormAddCell={(e) => excelFormControl().uploadedExcelForm().addCell(e)}
+                    moveHeaderFormUp={(e, detailId) => excelFormControl().uploadedExcelForm().moveUp(e, detailId)}
+                    moveHeaderFormDown={(e, detailId) => excelFormControl().uploadedExcelForm().moveDown(e, detailId)}
                 ></CreateTranslatorUploadHeaderDetailComponent>
             </ExcelTranslatorCommonModal>
         </>
