@@ -5,8 +5,8 @@ import styled from "styled-components";
 
 import { excelTranslatorDataConnect } from '../../data_connect/excelTranslatorDataConnect';
 import ExcelTranslatorControlBar from './ExcelTranslatorControlBar';
+import BackdropLoading from '../excel_translator/loading/BackdropLoading';
 import ExcelTranslatorDownloadExcelDataBoard from './ExcelTranslatorDownloadExcelDataBoard';
-import ExcelTranslatorDownloadDataBoard from './ExcelTranslatorDownloadExcelDataBoard';
 import ExcelTranslatorUploadDataBoard from './ExcelTranslatorUploadDataBoard';
 
 const Container = styled.div`
@@ -39,6 +39,7 @@ const ExcelTranslatorMain = (props) => {
         createdUploadHeader: false,
         createdDownloadHeader: false
     });
+    const [backdropLoading, setBackdropLoading] = useState(false);
 
     useEffect(() => {
         async function fetchInit() {
@@ -144,8 +145,8 @@ const ExcelTranslatorMain = (props) => {
                         alert(res?.data?.message);
                     })
             },
-            downloadTranslatedExcelFile: async function (translatedDetail) {
-                await excelTranslatorDataConnect().downloadTranslatedExcelFile(translatedDetail)
+            downloadTranslatedExcelFile: async function (translatedDetails) {
+                await excelTranslatorDataConnect().downloadTranslatedExcelFile(translatedDetails)
                     .then(res => {
                         const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
                         const link = document.createElement('a');
@@ -158,6 +159,21 @@ const ExcelTranslatorMain = (props) => {
                     .catch(err => {
                         console.log(err);
                     });
+            },
+            downloadUploadedHeaderDetails: async function (uploadedDetails) {
+                await excelTranslatorDataConnect().downloadUploadedHeaderDetails(uploadedDetails)
+                    .then(res => {
+                        const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+                        const link = document.createElement('a');
+                        link.href = url;
+
+                        link.setAttribute('download', '엑셀 형식 다운로드.xlsx');
+                        document.body.appendChild(link);
+                        link.click();
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
             }
         }
     }
@@ -267,6 +283,9 @@ const ExcelTranslatorMain = (props) => {
                 return {
                     submit: async function (uploadHeaderDetails) {
                         await __handleDataConnect().createUploadHeaderDetails(uploadHeaderDetails);
+                    },
+                    download: async function (uploadHeaderDetails) {
+                        await __handleDataConnect().downloadUploadedHeaderDetails(uploadHeaderDetails);
                     }
                 }
             },
@@ -280,19 +299,34 @@ const ExcelTranslatorMain = (props) => {
         }
     }
 
+    const loadingControl = () => {
+        return {
+            open : function () {
+                setBackdropLoading(true);
+            },
+            close: function () {
+                setBackdropLoading(false);
+            }
+        }
+    }
+
     return (
         <>
             <Container>
+                {/* Backdrop */}
+                <BackdropLoading open={backdropLoading} />
+
                 {/* 엑셀 변환기 컨트롤 바 */}
                 <ExcelTranslatorControlBar
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
                     uploadedExcelData={uploadedExcelData}
 
+                    loadingControl={loadingControl}
                     createTranslatorHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().submit(headerTitle)}
                     modifyTranslatorHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().modify(headerTitle)}
                     deleteTranslatorHeaderTitleControl={(headerId) => __handleEventControl().translatorHeaderTitle().delete(headerId)}
                     uploadExcelFileControl={(uploadedFormData) => __handleEventControl().uploadExcelData().submit(uploadedFormData)}
-                    downloadTranslatedExcelFileControl={(downloadHeaderDetail) => __handleEventControl().downloadTranslatedExcelFile().submit(downloadHeaderDetail)}
+                    downloadTranslatedExcelFileControl={(downloadHeaderDetail) => __handleEventControl().downloadUploadedHeaderDetail().submit(downloadHeaderDetail)}
                     resetUploadExcelFileControl={() => __handleEventControl().uploadExcelData().reset()}
                     changeSelectedHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().changeSelectedHeaderTitle(headerTitle)}
                 ></ExcelTranslatorControlBar>
@@ -302,7 +336,9 @@ const ExcelTranslatorMain = (props) => {
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
                     uploadedExcelData={uploadedExcelData}
 
+                    loadingControl={loadingControl}
                     createUploadHeaderDetailsControl={(uploadDetails) => __handleEventControl().uploadHeaderDetails().submit(uploadDetails)}
+                    downloadUploadHeaderDetailsControl={(uploadDetails) => __handleEventControl().uploadHeaderDetails().download(uploadDetails)}
                 ></ExcelTranslatorUploadDataBoard>
 
                 {/* 다운로드 헤더 보드 */}

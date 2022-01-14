@@ -16,7 +16,7 @@ const BoardTitle = styled.div`
     font-size: large;
     color: rgba(000, 102, 153, 0.9);
     display: grid;
-    grid-template-columns: 90% 10%;
+    grid-template-columns: 2fr 1fr;
     align-items: center;
     padding: 10px;
 
@@ -36,10 +36,10 @@ const BoardTitle = styled.div`
 
 const DataOptionBox = styled.span`
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     column-gap: 10px;
 
-    & .upload-header-create-btn {
+    & .upload-header-excel-download {
         background: #c0bff3;
         border: 1px solid #c0bff3;
 
@@ -54,23 +54,17 @@ const DataOptionBox = styled.span`
             transition: 0s;
             transform: scale(1.05);
         }
+
+        &:disabled{
+            background: #d3d3d388;
+            cursor: not-allowed;
+            border: none;
+        }
     }
 
-    & .upload-header-modify-btn {
-        background: rgb(255 206 154);
-        border: 1px solid rgb(255 206 154);
-
-        &:hover{
-            cursor: pointer;
-            transition: 0.2s;
-            transform: scale(1.05);
-            background: rgb(255 172 139);
-        }
-
-        &:active{
-            transition: 0s;
-            transform: scale(1.05);
-        }
+    @media only screen and (max-width: 992px) {
+        padding: 1% 0%;
+        column-gap: 20px;
     }
 `;
 
@@ -128,14 +122,15 @@ const BodyTd = styled.td`
 `;
 
 const HeaderFormControlBtn = styled.button`
-    padding: 3%;
+    padding: 2%;
     background: rgb(179 199 219);
-    color:white;
+    color: white;
     font-size: 1em;
     font-weight: 500;
     border:1px solid rgb(179 199 219);
     border-radius: 20px;
-    
+    float: right;
+
     @media only screen and (max-width: 992px){
         display: inline-block;
         padding: 4px;
@@ -512,6 +507,21 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                             type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
                             payload: headerDetailList
                         })
+                    },
+                    download: async function (e){
+                        e.preventDefault();
+
+                        props.loadingControl().open();
+
+                        let downloadDetail = selectedHeaderTitleState.uploadHeaderDetail.details.map(r => {
+                            return {
+                                ...r,
+                                colData: r.headerName
+                            }
+                        });
+
+                        await props.downloadUploadHeaderDetailsControl(downloadDetail);
+                        props.loadingControl().close();
                     }
                 }
             }
@@ -524,6 +534,7 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                 <BoardTitle>
                     <span>업로드 엑셀 헤더 및 데이터</span>
                     <DataOptionBox>
+                        <HeaderFormControlBtn type="button" className="upload-header-excel-download" onClick={(e) => excelFormControl().uploadedExcelForm().download(e)} disabled={!selectedHeaderTitleState?.uploadHeaderDetail.details.length}>양식 다운로드</HeaderFormControlBtn>
                         <HeaderFormControlBtn type="button" onClick={(e) => excelFormControl().uploadedExcelForm().open(e)}>양식 설정</HeaderFormControlBtn>
                     </DataOptionBox>
                 </BoardTitle>
@@ -531,7 +542,6 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                     <table className="table table-sm" style={{ tableLayout: 'fixed', width: '100%' }}>
                         <thead>
                             <tr>
-                                {/* {uploadedExcelHeaderData?.map((data, idx) => { */}
                                 {uploadedExcelHeaderDataState?.map((data, idx) => {
                                     return (
                                         <HeaderTh key={'upload_header_idx' + idx} className="fixed-header large-cell" scope="col">

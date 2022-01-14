@@ -46,7 +46,13 @@ const excelTranslatorDataConnect = () => {
         downloadTranslatedExcelFile: async function (uploadedExcelData) {
             return await axios.post(`/api/v1/excel-translator/download`, uploadedExcelData, {
                 responseType: 'blob',
-                withCredentials:true
+                withCredentials: true
+            })
+        },
+        downloadUploadedHeaderDetails: async function (uploadedDetails) {
+            return await axios.post(`api/v1/excel-translator/header/upload/download`, uploadedDetails, {
+                responseType: 'blob',
+                withCredentials: true
             })
         }
     }

@@ -16,7 +16,7 @@ const BoardTitle = styled.div`
     font-size: large;
     color: rgba(000, 102, 153, 0.9);
     display: grid;
-    grid-template-columns: 90% 10%;
+    grid-template-columns: 2fr 1fr;
     align-items: center;
     padding: 10px;
 
@@ -36,8 +36,12 @@ const BoardTitle = styled.div`
 
 const DataOptionBox = styled.span`
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     column-gap: 10px;
+
+    @media only screen and (max-width: 992px) {
+        padding: 1% 0%;
+    }
 `;
 
 const BoardContainer = styled.div`
@@ -81,17 +85,21 @@ const HeaderTh = styled.th`
 `;
 
 const StoreBtn = styled.button`
-    padding: 3%;
+    padding: 2%;
     background: rgb(179 199 219);
-    color:white;
+    color: white;
     font-size: 1em;
     font-weight: 500;
     border:1px solid rgb(179 199 219);
     border-radius: 20px;
+    float: right;
+    grid-column-start: 2;
 
     @media only screen and (max-width: 992px){
         display: inline-block;
         padding: 4px;
+        grid-column-start: 1;
+        grid-column-end: 3;
     }
 
     @media only screen and (max-width:576px ){

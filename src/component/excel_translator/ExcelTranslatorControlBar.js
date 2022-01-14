@@ -11,8 +11,6 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
 import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
-
-import BackdropLoading from '../excel_translator/loading/BackdropLoading';
 import CreateTranslatorHeaderTitleComponent from "./modal/CreateTranslatorHeaderTitleComponent";
 import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
 import ModifyTranslatorHeaderTitleComponent from "./modal/ModifyTranslatorHeaderTitleComponent";
@@ -246,7 +244,6 @@ const ExcelTranslatorControlBar = (props) => {
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
     const [createTranslatorHeaderTitleModalOpen, setCreateTranslatorHeaderTitleModalOpen] = useState(false);
     const [modifyTranslatorHeaderTitleModalOpen, setModifyTranslatorHeaderTitleModalOpen] = useState(false);
-    const [backdropLoading, setBackdropLoading] = useState(false);
 
     // Get Excel Translator Header Detail
     useEffect(() => {
@@ -415,9 +412,9 @@ const ExcelTranslatorControlBar = (props) => {
                             new Blob([JSON.stringify(selectedHeaderTitleState)], { type: "application/json" })
                         );
 
-                        loadingControl().open();
+                        props.loadingControl().open();
                         await props.uploadExcelFileControl(uploadedFormData);
-                        loadingControl().close();
+                        props.loadingControl().close();
                     }
                 }
             },
@@ -437,22 +434,11 @@ const ExcelTranslatorControlBar = (props) => {
                             return;
                         }
 
-                        loadingControl().open();
+                        props.loadingControl().open();
                         await props.downloadTranslatedExcelFileControl(selectedHeaderTitleState.downloadHeaderDetail.details);
-                        loadingControl().close();
+                        props.loadingControl().close();
                     }
                 }
-            }
-        }
-    }
-
-    const loadingControl = () => {
-        return {
-            open : function () {
-                setBackdropLoading(true);
-            },
-            close: function () {
-                setBackdropLoading(false);
             }
         }
     }
@@ -506,9 +492,6 @@ const ExcelTranslatorControlBar = (props) => {
                     </TranslatorBtnBox>
                 </DataContainer>
             </Container>
-
-            {/* Backdrop */}
-            <BackdropLoading open={backdropLoading} />
 
             {/* Create Header Title Modal */}
             <ExcelTranslatorCommonModal
