@@ -283,6 +283,7 @@ const ExcelTranslatorMain = (props) => {
                 return {
                     submit: async function (uploadHeaderDetails) {
                         await __handleDataConnect().createUploadHeaderDetails(uploadHeaderDetails);
+                        // TODO :: uploadHeaderDetail.details가 빈값일 때, downloadHeader도 빈 값으로 설정하자
                     },
                     download: async function (uploadHeaderDetails) {
                         await __handleDataConnect().downloadUploadedHeaderDetails(uploadHeaderDetails);
@@ -326,7 +327,7 @@ const ExcelTranslatorMain = (props) => {
                     modifyTranslatorHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().modify(headerTitle)}
                     deleteTranslatorHeaderTitleControl={(headerId) => __handleEventControl().translatorHeaderTitle().delete(headerId)}
                     uploadExcelFileControl={(uploadedFormData) => __handleEventControl().uploadExcelData().submit(uploadedFormData)}
-                    downloadTranslatedExcelFileControl={(downloadHeaderDetail) => __handleEventControl().downloadUploadedHeaderDetail().submit(downloadHeaderDetail)}
+                    downloadTranslatedExcelFileControl={(downloadHeaderDetail) => __handleEventControl().downloadTranslatedExcelFile().submit(downloadHeaderDetail)}
                     resetUploadExcelFileControl={() => __handleEventControl().uploadExcelData().reset()}
                     changeSelectedHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().changeSelectedHeaderTitle(headerTitle)}
                 ></ExcelTranslatorControlBar>

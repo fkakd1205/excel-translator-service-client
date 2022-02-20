@@ -328,6 +328,25 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                     checkOne: function (e, downloadHeaderId) {
                         if (e.target.checked) {
                             setFixedValueCheckList(fixedValueCheckList.concat(downloadHeaderId));
+
+                            // 체크하면 targetCellNumber을 -1으로 변경
+                            let newDetails = updateDownloadHeaderForm.downloadHeaderDetail.details.map(r=>{
+                                if(r.id === downloadHeaderId){
+                                    return {
+                                        ...r,
+                                        targetCellNumber: parseInt(-1)
+                                    }
+                                }else{
+                                    return {
+                                        ...r
+                                    }
+                                }
+                            });
+    
+                            dispatchUpdateDownloadHeaderForm({
+                                type: 'SET_DOWNLOAD_HEADER_DETAIL_DATA',
+                                payload: newDetails
+                            })
                         } else {
                             setFixedValueCheckList(fixedValueCheckList.filter(r => r !== downloadHeaderId));
 
@@ -336,7 +355,8 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                                 if(r.id === downloadHeaderId){
                                     return {
                                         ...r,
-                                        fixedValue: ""
+                                        fixedValue: "",
+                                        targetCellNumber: parseInt(-1)
                                     }
                                 }else{
                                     return {

@@ -102,7 +102,7 @@ const CreateBtn = styled.button`
 
 const DataInputEl = styled.input`
     border: none;
-    width: 100%;
+    width: 90%;
     padding: 10px;
     border-bottom: 1px solid #ced4da;
     &:focus{
