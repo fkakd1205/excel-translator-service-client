@@ -1,186 +1,11 @@
 import { useEffect, useReducer, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import queryString from 'query-string';
-import styled from "styled-components";
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import ClearIcon from '@mui/icons-material/Clear';
-import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
-import CreateTranslatorHeaderTitleComponent from "./modal/CreateTranslatorHeaderTitleComponent";
-import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
-import ModifyTranslatorHeaderTitleComponent from "./modal/ModifyTranslatorHeaderTitleComponent";
-
-const Container = styled.div`
-`;
-
-const TitleSelector = styled.div`
-    display: grid;
-    grid-template-columns: 50% auto;
-    padding: 20px 0px;
-    text-align: center;
-    align-items: center;
-
-    @media only screen and (max-width: 992px) {
-        padding: 10px;
-        grid-template-columns: 100%;
-        row-gap: 20px;
-        place-content: center;
-    }
-`;
-
-const FormInput = styled.div`
-    color: black;
-    display: flex;
-    vertical-align: middle;
-
-    @media only screen and (max-width: 992px) {
-        font-size: 10px;
-        grid-row: end;
-    }
-`;
-
-const TitleControlBtn = styled.button`
-    background: #989fb7;
-    color:white;
-    border:1px solid #989fb7;
-    border-radius: 3px;
-    margin-left: 10px;
-    padding: 10px;
-
-    &:hover {
-        opacity: 0.8;
-        cursor: pointer;
-    }
-
-    @media only screen and (max-width: 992px) {
-        padding: 6px;
-    }
-`;
-
-const DataContainer = styled.div`
-`;
-
-const TranslatorBtnBox = styled.div`
-    padding: 0 3%;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    text-align: center;
-    align-items: center;
-
-    @media only screen and (max-width: 992px){
-        grid-template-columns: 100%;
-    }
-`;
-
-const Form = styled.form`
-    margin: 10px;
-
-    @media only screen and (max-width: 992px){
-        margin: 0 auto;
-        width: 100%;
-    }
-`;
-
-const FromGroup = styled.div`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    column-gap: 20px;
-    text-align: center;
-    align-items: center;
-
-
-    @media only screen and (max-width: 992px){
-        grid-template-columns: none;
-        grid-template-rows: repeat(1, 1fr);
-    }
-`;
-
-const ControlLabel = styled.label`
-    font-size: 1rem;
-    display: inline-block;
-    margin: 4px;
-    width: 100%;
-    padding: 3% 0%;
-    color: white;
-    text-align: center;
-    vertical-align: middle;
-    background-color: #a9b3d5;
-    border-radius: 3px;
-    transition: 0.15s linear;
-    font-weight: 600;
-
-    &:hover {
-        opacity: 0.8;
-        cursor: pointer;
-    }
-
-    @media only screen and (max-width:992px){
-        padding: 1.5% 0%;
-    }
-
-    @media only screen and (max-width:768px){
-        font-size: 14px;
-    }
-
-    @media only screen and (max-width:576px){
-        font-size: 12px;
-    }
-`;
-
-const ControlBtn = styled.button`
-    font-size: 1rem;
-    width: 100%;
-    padding: 3% 0%;
-    margin: 4px;
-    color: white;
-    vertical-align: middle;
-    background-color: #a9b3d5;
-    border-radius: 3px;
-    border: none;
-    transition: 0.15s linear;
-    font-weight: 600;
-
-    &:hover {
-        opacity: 0.8;
-        cursor: pointer;
-    }
-
-    @media only screen and (max-width:992px){
-        padding: 1.5% 0%;
-    }
-
-    @media only screen and (max-width:768px){
-        font-size: 14px;
-    }
-
-    @media only screen and (max-width:576px){
-        font-size: 12px;
-    }
-`;
-
-const Input = styled.input`
-    font-size: 20px;
-    width: 100%;
-    display: none;
-`;
-
-const TitleControlBox = styled.div`
-    display: flex;
-
-    @media only screen and (max-width: 992px) {
-        justify-content: flex-end;
-    }
-`;
-
-const DeleteBtn = styled.div`
-    width: auto;
-    float: right;
-`;
+import CreateTranslatorHeaderTitleComponent from "../modal/CreateTranslatorHeaderTitleComponent";
+import ExcelTranslatorCommonModal from "../modal/ExcelTranslatorCommonModal";
+import ModifyTranslatorHeaderTitleComponent from "../modal/ModifyTranslatorHeaderTitleComponent";
+import ControlBarBody from "./ControlBarBody";
+import { createSearchParams, useLocation, useNavigate } from "react-router-dom";
 
 class ExcelTranslatorHeader {
     constructor() {
@@ -236,9 +61,11 @@ const selectedHeaderTitleStateReducer = (state, action) => {
     }
 }
 
-const ExcelTranslatorControlBar = (props) => {
-    let pathname = props.location.pathname;
-    let params = queryString.parse(props.location.search);
+export default function ControlBarMain(props) {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const pathname = location.pathname;
+    const query = queryString.parse(location.search)
 
     const [excelTitleInfo, dispatchExcelTitleInfo] = useReducer(excelTitleInfoReducer, initialExcelTitle);
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
@@ -252,14 +79,14 @@ const ExcelTranslatorControlBar = (props) => {
                 return;
             }
             
-            if(!params.headerId) {
+            if(!query.headerId) {
                 dispatchSelectedHeaderTitleState({
                     type: 'CLEAR'
                 })
                 return;
             }
 
-            let headerId = params.headerId;
+            let headerId = query.headerId;
             let headerTitleState = props.excelTranslatorHeaderList?.filter(r => r.id === headerId)[0];
 
             dispatchSelectedHeaderTitleState({
@@ -268,7 +95,7 @@ const ExcelTranslatorControlBar = (props) => {
             });
         }
         initHeaderTitleState();
-    }, [params.headerId, props.excelTranslatorHeaderList]);
+    }, [query.headerId, props.excelTranslatorHeaderList]);
 
 
     const onCreateTranslatorHeaderTitleModalOpen = () => {
@@ -331,14 +158,22 @@ const ExcelTranslatorControlBar = (props) => {
                 await props.createTranslatorHeaderTitleControl(excelHeader);
                 
                 // 새로 생성된 타이틀 형식이 선택되도록 설정.
-                props.history.replace({
-                    pathname: pathname,
-                    search: `?${queryString.stringify({
-                        ...params,
-                        headerId: excelHeader.id
-                    })}`
-                })
+                // props.history.replace({
+                //     pathname: pathname,
+                //     search: `?${queryString.stringify({
+                //         ...param,
+                //         headerId: excelHeader.id
+                //     })}`
+                // })
+                query.headerId = excelHeader.id
 
+                navigate({
+                    pathname: location.pathname,
+                    search: `?${createSearchParams({...query})}`,
+                }, {
+                    replace: true
+                })
+                
                 onCreateUploadExcelHeaderModalClose();
             },
             modify: async function (e) {
@@ -360,14 +195,14 @@ const ExcelTranslatorControlBar = (props) => {
             selectHeaderTitle: function (e) {
                 e.preventDefault();
 
-                let selectedHeader = props.excelTranslatorHeaderList.filter(r => r.id === e.target.value)[0];
+                let selectedHeaderId = props.excelTranslatorHeaderList.find(r => r.id === e.target.value).id;
+                query.headerId = selectedHeaderId
 
-                props.history.replace({
-                    pathname: pathname,
-                    search: `?${queryString.stringify({
-                        ...params,
-                        headerId: selectedHeader.id
-                    })}`
+                navigate({
+                    pathname: location.pathname,
+                    search: `?${createSearchParams({...query})}`,
+                }, {
+                    replace: true
                 })
             },
             delete: async function (e) {
@@ -377,11 +212,18 @@ const ExcelTranslatorControlBar = (props) => {
                     alert('삭제하려는 엑셀 형식을 먼저 선택해주세요.');
                     return;
                 }
-
+                
+                if(!window.confirm('정말 삭제하시겠습니까?')) {
+                    return;    
+                }
+                
                 await props.deleteTranslatorHeaderTitleControl(selectedHeaderTitleState.id);
 
-                props.history.replace({
-                    pathname: pathname
+                navigate({
+                    pathname: location.pathname,
+                    search: `?${createSearchParams({...query})}`,
+                }, {
+                    replace: true
                 })
             }
         }
@@ -445,53 +287,15 @@ const ExcelTranslatorControlBar = (props) => {
 
     return (
         <>
-            <Container>
-                <DataContainer>
-                    <TranslatorBtnBox>
-                        <TitleSelector>
-                            <FormInput>
-                                <div style={{ width: '100%' }}>
-                                    <Box sx={{ display: 'flex' }}>
-                                        <FormControl fullWidth>
-                                            <InputLabel id="storage-title-select-id">엑셀 형식 선택</InputLabel>
-                                            <Select
-                                                labelId="storage-title-select-id"
-                                                id="storage-title-select"
-                                                value={selectedHeaderTitleState?.id || ''}
-                                                label="storage-title-selector"
-                                                onChange={(e) => excelTranslatorHeaderControl().selectHeaderTitle(e)}
-                                                defaultValue=''
-                                            >
-                                                {props.excelTranslatorHeaderList?.map((data, idx) => {
-                                                    return (
-                                                        <MenuItem key={'excel_translator_title' + idx} value={data.id}>
-                                                            {data.uploadHeaderTitle + ' > ' + data.downloadHeaderTitle + ' (' + data.rowStartNumber + ')'}
-                                                        </MenuItem>
-                                                    )
-                                                })}
-                                            </Select>
-                                        </FormControl>
-                                    </Box>
-                                </div>
-                            </FormInput>
-                            <TitleControlBox>
-                                <TitleControlBtn type="button" onClick={() => onCreateTranslatorHeaderTitleModalOpen()}><AddIcon /></TitleControlBtn>
-                                <TitleControlBtn type="button" onClick={() => onModifyTranslatorHeaderTitleModalOpen()}><EditIcon /></TitleControlBtn>
-                                <TitleControlBtn type="button" onClick={(e) => excelTranslatorHeaderControl().delete(e)}><ClearIcon /></TitleControlBtn>
-                            </TitleControlBox>
-                        </TitleSelector>
-                        <FromGroup>
-                            <Form>
-                                <ControlLabel htmlFor="upload-file-input">Upload</ControlLabel>
-                                <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => excelFileControl().uploadExcel().uploadExcelFile(e)} />
-                            </Form>
-                            <Form onSubmit={(e) => excelFileControl().downloadExcel().downloadTranslatedExcelFile(e)}>
-                                <ControlBtn type="submit">Download</ControlBtn>
-                            </Form>
-                        </FromGroup>
-                    </TranslatorBtnBox>
-                </DataContainer>
-            </Container>
+            <ControlBarBody
+                excelTranslatorHeaderList={props.excelTranslatorHeaderList}
+                selectedHeaderTitleState={selectedHeaderTitleState}
+
+                excelFileControl={excelFileControl}
+                excelTranslatorHeaderControl={excelTranslatorHeaderControl}
+                onCreateTranslatorHeaderTitleModalOpen={onCreateTranslatorHeaderTitleModalOpen}
+                onModifyTranslatorHeaderTitleModalOpen={onModifyTranslatorHeaderTitleModalOpen}
+            />
 
             {/* Create Header Title Modal */}
             <ExcelTranslatorCommonModal
@@ -504,7 +308,7 @@ const ExcelTranslatorControlBar = (props) => {
                     excelTitleInfo={excelTitleInfo}
 
                     onChangeInputValue={onChangeInputValue}
-                    excelTranslatorHeaderControl={excelTranslatorHeaderControl}
+                    excelTranslatorHeaderControl={props.excelTranslatorHeaderControl}
                 ></CreateTranslatorHeaderTitleComponent>
             </ExcelTranslatorCommonModal>
 
@@ -519,11 +323,9 @@ const ExcelTranslatorControlBar = (props) => {
                     excelTitleInfo={excelTitleInfo}
 
                     onChangeInputValue={onChangeInputValue}
-                    excelTranslatorHeaderControl={excelTranslatorHeaderControl}
+                    excelTranslatorHeaderControl={props.excelTranslatorHeaderControl}
                 ></ModifyTranslatorHeaderTitleComponent>
             </ExcelTranslatorCommonModal>
         </>
     )
 }
-
-export default withRouter(ExcelTranslatorControlBar);

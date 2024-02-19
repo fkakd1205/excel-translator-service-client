@@ -1,18 +1,13 @@
-import { useState, useEffect, useReducer } from 'react';
+import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import queryString from 'query-string';
-import styled from "styled-components";
 
-import { excelTranslatorDataConnect } from '../../data_connect/excelTranslatorDataConnect';
-import ExcelTranslatorControlBar from './ExcelTranslatorControlBar';
-import BackdropLoading from '../excel_translator/loading/BackdropLoading';
-import ExcelTranslatorDownloadExcelDataBoard from './ExcelTranslatorDownloadExcelDataBoard';
-import ExcelTranslatorUploadDataBoard from './ExcelTranslatorUploadDataBoard';
-
-const Container = styled.div`
-    height: 100vh;
-    background-color: #f2f5ff;
-`;
+import { excelTranslatorDataConnect } from '../../data-connect/excelTranslatorDataConnect';
+import BackdropLoading from '../loading/BackdropLoading';
+import { Container } from './styles/Body.styled';
+import ControlBarMain from './control-bar/ControlBarMain';
+import DownloadContainerMain from './download-container/DownloadContainerMain';
+import { useLocation } from 'react-router-dom';
+import UploadContainerMain from './upload-container/UploadContainerMain';
 
 class TranslatedData {
     constructor() {
@@ -30,8 +25,9 @@ class TranslatedData {
     }
 }
 
-const ExcelTranslatorMain = (props) => {
-
+export default function ExcelTranslatorMain(props) {
+    const location = useLocation();
+    
     const [excelTranslatorHeaderList, setExcelTranslatorHeaderList] = useState(null);
     const [uploadedExcelData, setUploadedExcelData] = useState(null);
     const [isObjectSubmitted, setIsObjectSubmitted] = useState({
@@ -51,7 +47,7 @@ const ExcelTranslatorMain = (props) => {
 
     useEffect(()=>{
         setUploadedExcelData(null);
-    },[props.location])
+    },[location])
 
     const __handleDataConnect = () => {
         return {
@@ -314,11 +310,8 @@ const ExcelTranslatorMain = (props) => {
     return (
         <>
             <Container>
-                {/* Backdrop */}
-                <BackdropLoading open={backdropLoading} />
-
                 {/* 엑셀 변환기 컨트롤 바 */}
-                <ExcelTranslatorControlBar
+                <ControlBarMain
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
                     uploadedExcelData={uploadedExcelData}
 
@@ -330,27 +323,29 @@ const ExcelTranslatorMain = (props) => {
                     downloadTranslatedExcelFileControl={(downloadHeaderDetail) => __handleEventControl().downloadTranslatedExcelFile().submit(downloadHeaderDetail)}
                     resetUploadExcelFileControl={() => __handleEventControl().uploadExcelData().reset()}
                     changeSelectedHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().changeSelectedHeaderTitle(headerTitle)}
-                ></ExcelTranslatorControlBar>
+                />
 
                 {/* 업로드 헤더 및 데이터 보드 */}
-                <ExcelTranslatorUploadDataBoard
+                <UploadContainerMain
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
                     uploadedExcelData={uploadedExcelData}
 
                     loadingControl={loadingControl}
                     createUploadHeaderDetailsControl={(uploadDetails) => __handleEventControl().uploadHeaderDetails().submit(uploadDetails)}
                     downloadUploadHeaderDetailsControl={(uploadDetails) => __handleEventControl().uploadHeaderDetails().download(uploadDetails)}
-                ></ExcelTranslatorUploadDataBoard>
+                />
 
                 {/* 다운로드 헤더 보드 */}
-                <ExcelTranslatorDownloadExcelDataBoard
+
+                <DownloadContainerMain
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
 
                     createDownloadHeaderDetailsControl={(downloadDetails) => __handleEventControl().downloadHeaderDetails().submit(downloadDetails)}
-                ></ExcelTranslatorDownloadExcelDataBoard>
+                />
             </Container>
+
+            {/* Backdrop */}
+            <BackdropLoading open={backdropLoading} />
         </>
     )
 }
-
-export default ExcelTranslatorMain;

@@ -1,157 +1,10 @@
 import { useEffect, useReducer, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import queryString from 'query-string';
-import styled from "styled-components";
-import { withRouter } from 'react-router';
-import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
-import { dateToYYMMDDhhmmss } from "./handler/dateHandler"
-import CreateTranslatorUploadHeaderDetailComponent from "./modal/CreateTranslatorUploadHeaderDetailComponent";
-import { isFocusable } from "@testing-library/user-event/dist/utils";
-
-const Container = styled.div`
-    padding: 0 2%;
-`;
-
-const BoardTitle = styled.div`
-    font-size: large;
-    color: rgba(000, 102, 153, 0.9);
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    align-items: center;
-    padding: 10px;
-
-    @media only screen and (max-width: 992px){
-        grid-template-columns: 1fr;
-        row-gap: 10px;
-    }
-    
-    @media only screen and (max-width:576px){
-        font-size: 16px;
-    }
-
-    @media only screen and (max-width:320px){
-        font-size: 14px;
-    }
-`;
-
-const DataOptionBox = styled.span`
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 10px;
-
-    & .upload-header-excel-download {
-        background: #c0bff3;
-        border: 1px solid #c0bff3;
-
-        &:hover{
-            cursor: pointer;
-            transition: 0.2s;
-            transform: scale(1.05);
-            background: #a5a3ff;
-        }
-
-        &:active{
-            transition: 0s;
-            transform: scale(1.05);
-        }
-
-        &:disabled{
-            background: #d3d3d388;
-            cursor: not-allowed;
-            border: none;
-        }
-    }
-
-    @media only screen and (max-width: 992px) {
-        padding: 1% 0%;
-        column-gap: 20px;
-    }
-`;
-
-const BoardContainer = styled.div`
-    min-height: 60vh;
-    max-height: 60px;
-    background-color: white;
-    overflow: auto;
-    border-radius: 5px;
-    font-size: 14px;
-    box-shadow: 1px 1px 15px #a9b3d599;
-
-    & .fixed-header {
-        position: sticky;
-        top: -1px;
-        background: #d5dae9;
-        z-index:10;
-        padding: 2px;
-        font-size: 16px;
-
-        @media only screen and (max-width:576px){
-            font-size: 14px;
-        }
-    }
-
-    & .large-cell {
-        width: 300px;
-    }
-
-    & .xlarge-cell {
-        width: 500px;
-    }
-
-    @media only screen and (max-width:576px){
-        font-size: 12px;
-    }
-`;
-
-const HeaderTh = styled.th`
-    vertical-align: middle !important;
-    text-align: center;
-    width: 150px;
-    border-right: 1px solid #efefef;
-`;
-
-const BodyTr = styled.tr`
-    border-bottom: 1px solid #a7a7a740;
-`;
-
-const BodyTd = styled.td`
-    vertical-align: middle !important;
-    text-align: center;
-    width: 150px;
-    border-right: 1px solid #a7a7a720;
-`;
-
-const HeaderFormControlBtn = styled.button`
-    padding: 2%;
-    background: rgb(179 199 219);
-    color: white;
-    font-size: 1em;
-    font-weight: 500;
-    border:1px solid rgb(179 199 219);
-    border-radius: 20px;
-    float: right;
-
-    @media only screen and (max-width: 992px){
-        display: inline-block;
-        padding: 4px;
-    }
-
-    @media only screen and (max-width:576px ){
-        padding: 0;
-    }
-
-    &:hover{
-        cursor: pointer;
-        transition: 0.2s;
-        transform: scale(1.05);
-        background: rgb(160 180 200);
-    }
-
-    &:active{
-        transition: 0s;
-        transform: scale(1.05);
-    }
-`;
+import ExcelTranslatorCommonModal from "../modal/ExcelTranslatorCommonModal";
+import CreateTranslatorUploadHeaderDetailComponent from "../modal/CreateTranslatorUploadHeaderDetailComponent";
+import { useLocation } from "react-router-dom";
+import UploadContainerBody from "./UploadContainerBody";
 
 class UploadHeaderDetail {
     constructor() {
@@ -170,7 +23,6 @@ class UploadHeaderDetail {
         }
     }
 }
-
 
 const initialSelectedHeaderTitleState = null;
 const initialCreateUploadHeaderDetailState = null;
@@ -233,8 +85,9 @@ const uploadExcelDataStateReducer = (state, action) => {
     }
 }
 
-const ExcelTranslatorUploadDataBoard = (props) => {
-    let params = queryString.parse(props.location.search);
+export default function UploadContainerMain(props) {
+    const location = useLocation()
+    let query = queryString.parse(location.search);
 
     const [createTranslatorUploadHeaderDetailModalOpen, setCreateTranslatorUploadHeaderDetailModalOpen] = useState(false);
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
@@ -249,7 +102,7 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                 return;
             }
 
-            if(!params.headerId) {
+            if(!query.headerId) {
                 dispatchSelectedHeaderTitleState({
                     type: 'CLEAR'
                 });
@@ -269,7 +122,7 @@ const ExcelTranslatorUploadDataBoard = (props) => {
                 type: 'CLEAR'
             })
             
-            let headerId = params.headerId;
+            let headerId = query.headerId;
             let headerTitleState = props.excelTranslatorHeaderList?.filter(r => r.id === headerId)[0];
 
             dispatchSelectedHeaderTitleState({
@@ -278,7 +131,7 @@ const ExcelTranslatorUploadDataBoard = (props) => {
             });
         }
         initHeaderTitleState();
-    }, [params.headerId, props.excelTranslatorHeaderList]);
+    }, [query.headerId, props.excelTranslatorHeaderList]);
 
     useEffect(() => {
         if (!selectedHeaderTitleState) {
@@ -530,47 +383,13 @@ const ExcelTranslatorUploadDataBoard = (props) => {
 
     return (
         <>
-            <Container>
-                <BoardTitle>
-                    <span>업로드 엑셀 헤더 및 데이터</span>
-                    <DataOptionBox>
-                        <HeaderFormControlBtn type="button" className="upload-header-excel-download" onClick={(e) => excelFormControl().uploadedExcelForm().download(e)} disabled={!selectedHeaderTitleState?.uploadHeaderDetail.details.length}>양식 다운로드</HeaderFormControlBtn>
-                        <HeaderFormControlBtn type="button" onClick={(e) => excelFormControl().uploadedExcelForm().open(e)}>양식 설정</HeaderFormControlBtn>
-                    </DataOptionBox>
-                </BoardTitle>
-                <BoardContainer>
-                    <table className="table table-sm" style={{ tableLayout: 'fixed', width: '100%' }}>
-                        <thead>
-                            <tr>
-                                {uploadedExcelHeaderDataState?.map((data, idx) => {
-                                    return (
-                                        <HeaderTh key={'upload_header_idx' + idx} className="fixed-header large-cell" scope="col">
-                                            <span>{data.colData}</span>
-                                        </HeaderTh>
-                                    )
-                                })}
-                            </tr>
-                        </thead>
-                        <tbody style={{ border: 'none' }}>
-                            {uploadedExcelDataState?.map((data, idx) => {
-                                return (
-                                    <BodyTr
-                                        key={'upload_exel_data_idx' + idx}
-                                    >
-                                        {data.uploadedData.details.map((detailData, detailIdx) => {
-                                            return (
-                                                <BodyTd key={'upload_excel_data_detail_idx' + detailIdx} className="col">
-                                                    <span>{detailData.cellType === 'Date' ? dateToYYMMDDhhmmss(detailData.colData) : detailData.colData}</span>
-                                                </BodyTd>
-                                            )
-                                        })}
-                                    </BodyTr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
-                </BoardContainer>
-            </Container>
+            <UploadContainerBody
+                uploadedExcelHeaderDataState={uploadedExcelHeaderDataState}
+                uploadedExcelDataState={uploadedExcelDataState}
+                selectedHeaderTitleState={selectedHeaderTitleState}
+
+                excelFormControl={excelFormControl}
+            />
 
             {/* Create Upload Header Form Check Modal */}
             <ExcelTranslatorCommonModal
@@ -594,5 +413,3 @@ const ExcelTranslatorUploadDataBoard = (props) => {
         </>
     )
 }
-
-export default withRouter(ExcelTranslatorUploadDataBoard);

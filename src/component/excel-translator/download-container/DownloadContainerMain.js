@@ -1,123 +1,10 @@
 import { useState, useReducer, useEffect } from "react";
-import styled from "styled-components";
 import { v4 as uuidv4 } from 'uuid';
 import queryString from 'query-string';
-import { withRouter } from 'react-router';
-import CreateTranslatorDownloadHeaderDetailComponent from "./modal/CreateTranslatorDownloadHeaderDetailComponent";
-import ExcelTranslatorCommonModal from "./modal/ExcelTranslatorCommonModal";
-
-const Container = styled.div`
-    padding: 2%;
-    background-color: #f2f5ff;
-    padding-bottom: 100px;
-`;
-
-const BoardTitle = styled.div`
-    font-size: large;
-    color: rgba(000, 102, 153, 0.9);
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    align-items: center;
-    padding: 10px;
-
-    @media only screen and (max-width: 992px){
-        grid-template-columns: 1fr;
-        row-gap: 10px;
-    }
-    
-    @media only screen and (max-width:576px){
-        font-size: 16px;
-    }
-
-    @media only screen and (max-width:320px){
-        font-size: 14px;
-    }
-`;
-
-const DataOptionBox = styled.span`
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 10px;
-
-    @media only screen and (max-width: 992px) {
-        padding: 1% 0%;
-    }
-`;
-
-const BoardContainer = styled.div`
-    background-color: white;
-    border-radius: 5px;
-    font-size: 14px;
-    overflow: auto;
-    box-shadow: 1px 1px 15px #a9b3d599;
-
-    & .fixed-header {
-        position: sticky;
-        top: -1px;
-        background: #d5dae9;
-        z-index:10;
-        padding: 2px;
-        font-size: 16px;
-
-        @media only screen and (max-width:576px){
-            font-size: 12px;
-        }
-    }
-
-    & .large-cell {
-        width: 300px;
-    }
-
-    & .xlarge-cell {
-        width: 500px;
-    }
-
-    @media only screen and (max-width:576px){
-        font-size: 12px;
-    }
-`;
-
-const HeaderTh = styled.th`
-    vertical-align: middle !important;
-    text-align: center;
-    width: 150px;
-    border-right: 1px solid #efefef;
-`;
-
-const StoreBtn = styled.button`
-    padding: 2%;
-    background: rgb(179 199 219);
-    color: white;
-    font-size: 1em;
-    font-weight: 500;
-    border:1px solid rgb(179 199 219);
-    border-radius: 20px;
-    float: right;
-    grid-column-start: 2;
-
-    @media only screen and (max-width: 992px){
-        display: inline-block;
-        padding: 4px;
-        grid-column-start: 1;
-        grid-column-end: 3;
-    }
-
-    @media only screen and (max-width:576px ){
-        padding: 0;
-    }
-
-    &:hover{
-        cursor: pointer;
-        transition: 0.2s;
-        transform: scale(1.05);
-        background: rgb(160 180 200);
-    }
-
-    &:active{
-        transition: 0s;
-        transform: scale(1.05);
-    }
-`;
+import CreateTranslatorDownloadHeaderDetailComponent from "../modal/CreateTranslatorDownloadHeaderDetailComponent";
+import ExcelTranslatorCommonModal from "../modal/ExcelTranslatorCommonModal";
+import DownloadContainerBody from "./DownloadContainerBody";
+import { useLocation, useNavigate } from "react-router-dom";
 
 class DownloadHeaderDetail {
     constructor() {
@@ -178,8 +65,10 @@ const updateDownloadHeaderFormReducer = (state, action) => {
     }
 }
 
-const ExcelTranslatorDownloadDataBoard = (props) => {
-    let params = queryString.parse(props.location.search);
+export default function DownloadContainerMain(props) {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const query = queryString.parse(location.search)
 
     const [createTranslatorDownloadHeaderDetailModalOpen, setCreateTranslatorDownloadHeaderDetailModalOpen] = useState(false);
     const [fixedValueCheckList, setFixedValueCheckList] = useState([]);
@@ -201,14 +90,14 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
                 return;
             }
 
-            if(!params.headerId) {
+            if(!query.headerId) {
                 dispatchSelectedHeaderTitleState({
                     type: 'CLEAR'
                 });
                 return;
             }
 
-            let headerId = params.headerId;
+            let headerId = query.headerId;
             let headerTitleState = props.excelTranslatorHeaderList?.filter(r => r.id === headerId)[0];
 
             dispatchSelectedHeaderTitleState({
@@ -217,7 +106,7 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
             });
         }
         initHeaderTitleState();
-    }, [params.headerId, props.excelTranslatorHeaderList]);
+    }, [query.headerId, props.excelTranslatorHeaderList]);
 
     const excelFormControl = () => {
         return {
@@ -399,29 +288,13 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
 
     return (
         <>
-            <Container>
-                <BoardTitle>
-                    <span>다운로드 엑셀 헤더</span>
-                    <DataOptionBox>
-                        <StoreBtn type="button" onClick={(e) => excelFormControl().downloadExcelForm().open(e)}>양식 설정</StoreBtn>
-                    </DataOptionBox>
-                </BoardTitle>
-                <BoardContainer>
-                    <table className="table table-sm" style={{ tableLayout: 'fixed', width: '100%' }}>
-                        <thead>
-                            <tr>
-                                {selectedHeaderTitleState?.downloadHeaderDetail?.details.map((data, idx) => {
-                                    return (
-                                        <HeaderTh key={'download_header_idx' + idx} className="fixed-header large-cell" scope="col">
-                                            <span>{idx + 1}. </span><span>{data.headerName}</span>
-                                        </HeaderTh>
-                                    )
-                                })}
-                            </tr>
-                        </thead>
-                    </table>
-                </BoardContainer>
-            </Container>
+            <DownloadContainerBody
+                createTranslatorDownloadHeaderDetailModalOpen={createTranslatorDownloadHeaderDetailModalOpen}
+                selectedHeaderTitleState={selectedHeaderTitleState}
+                updateDownloadHeaderForm={updateDownloadHeaderForm}
+
+                excelFormControl={excelFormControl}
+            />
 
             {/* Create Download Header Modal */}
             <ExcelTranslatorCommonModal
@@ -442,5 +315,3 @@ const ExcelTranslatorDownloadDataBoard = (props) => {
         </>
     )
 }
-
-export default withRouter(ExcelTranslatorDownloadDataBoard);
