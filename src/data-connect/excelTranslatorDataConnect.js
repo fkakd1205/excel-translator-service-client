@@ -2,12 +2,12 @@ import axios from "axios";
 
 const excelTranslatorDataConnect = () => {
     return {
-        searchList: async function () {
-            return await axios.get(`api/v1/excel-translator/list`, {
+        searchAll: async function () {
+            return await axios.get(`api/v1/excel-translator/all`, {
                 withCredentials: true
             })
         },
-        postOne: async function (headerTitle) {
+        createOne: async function (headerTitle) {
             return await axios.post(`/api/v1/excel-translator/one`, headerTitle, {
                 withCredentials: true
             })
@@ -25,7 +25,7 @@ const excelTranslatorDataConnect = () => {
                 withCredentials: true
             })
         },
-        postFile: async function (formData) {
+        uploadFile: async function (formData) {
             return await axios.post(`/api/v1/excel-translator/upload`, formData, {
                 headers: {
                     "content-types": "multipart/form-data"

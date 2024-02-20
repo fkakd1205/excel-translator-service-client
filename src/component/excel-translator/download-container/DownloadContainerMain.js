@@ -178,7 +178,7 @@ export default function DownloadContainerMain(props) {
                     createDownloadExcelHeaderDetail: async function (e) {
                         e.preventDefault();
 
-                        await props.createDownloadHeaderDetailsControl(updateDownloadHeaderForm);
+                        await props.handleCreateDownloadForm(updateDownloadHeaderForm);
                         
                         dispatchSelectedHeaderTitleState({
                             type: 'INIT_DATA',

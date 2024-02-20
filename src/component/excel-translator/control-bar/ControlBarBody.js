@@ -20,9 +20,9 @@ export default function ControlBarBody(props) {
                                             <Select
                                                 labelId="storage-title-select-id"
                                                 id="storage-title-select"
-                                                value={props.selectedHeaderTitleState?.id || ''}
+                                                value={props.selectedHeader?.id || ''}
                                                 label="storage-title-selector"
-                                                onChange={(e) => props.excelTranslatorHeaderControl().selectHeaderTitle(e)}
+                                                onChange={(e) => props.handleChangeSelectedHeader(e)}
                                                 defaultValue=''
                                             >
                                                 {props.excelTranslatorHeaderList?.map((data, idx) => {
@@ -38,13 +38,13 @@ export default function ControlBarBody(props) {
                                 </div>
                             </FormInput>
                             <TitleControlBox>
-                                <TitleControlBtn type="button" onClick={() => props.onCreateTranslatorHeaderTitleModalOpen()}>
+                                <TitleControlBtn type="button" onClick={() => props.onCreateHeaderModalOpen()}>
                                     <img src="/assets/icons/add_ffffff.svg" />
                                 </TitleControlBtn>
-                                <TitleControlBtn type="button" onClick={() => props.onModifyTranslatorHeaderTitleModalOpen()}>
+                                <TitleControlBtn type="button" onClick={() => props.onModifyHeaderModalOpen()}>
                                     <img src="/assets/icons/edit_ffffff.svg" />
                                 </TitleControlBtn>
-                                <TitleControlBtn type="button" onClick={(e) => props.excelTranslatorHeaderControl().delete(e)}>
+                                <TitleControlBtn type="button" onClick={(e) => props.handleDeleteTranslatorForm(e)}>
                                     <img src="/assets/icons/delete_ffffff.svg" />
                                 </TitleControlBtn>
                             </TitleControlBox>
@@ -52,9 +52,9 @@ export default function ControlBarBody(props) {
                         <FromGroup>
                             <Form>
                                 <ControlLabel htmlFor="upload-file-input">Upload</ControlLabel>
-                                <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => props.excelFileControl().uploadExcel().uploadExcelFile(e)} />
+                                <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => props.handleUploadExcelFile(e)} />
                             </Form>
-                            <Form onSubmit={(e) => props.excelFileControl().downloadExcel().downloadTranslatedExcelFile(e)}>
+                            <Form onSubmit={(e) => props.handleDownloadTranslatedFile(e)}>
                                 <ControlBtn type="submit">Download</ControlBtn>
                             </Form>
                         </FromGroup>

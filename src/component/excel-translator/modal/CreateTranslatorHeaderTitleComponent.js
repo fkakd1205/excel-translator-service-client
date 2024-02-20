@@ -124,7 +124,7 @@ const CreateTranslatorHeaderTitleComponent = (props) => {
     return (
         <>
             <Container>
-                <form onSubmit={(e) => props.excelTranslatorHeaderControl().submit(e)}>
+                <form onSubmit={(e) => props.handleCreateTranslatorTitle(e)}>
                     <ItemContainer>
                         <ItemWrapper>
                             <ItemHeaderWrapper>

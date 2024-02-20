@@ -6,7 +6,6 @@ import BackdropLoading from '../loading/BackdropLoading';
 import { Container } from './styles/Body.styled';
 import ControlBarMain from './control-bar/ControlBarMain';
 import DownloadContainerMain from './download-container/DownloadContainerMain';
-import { useLocation } from 'react-router-dom';
 import UploadContainerMain from './upload-container/UploadContainerMain';
 
 class TranslatedData {
@@ -26,16 +25,16 @@ class TranslatedData {
 }
 
 export default function ExcelTranslatorMain(props) {
-    const location = useLocation();
-    
     const [excelTranslatorHeaderList, setExcelTranslatorHeaderList] = useState(null);
     const [uploadedExcelData, setUploadedExcelData] = useState(null);
+    const [backdropLoading, setBackdropLoading] = useState(false);
+    
+    // TODO :: 제거
     const [isObjectSubmitted, setIsObjectSubmitted] = useState({
         createdHeader: false,
         createdUploadHeader: false,
         createdDownloadHeader: false
     });
-    const [backdropLoading, setBackdropLoading] = useState(false);
 
     useEffect(() => {
         async function fetchInit() {
@@ -45,56 +44,13 @@ export default function ExcelTranslatorMain(props) {
         fetchInit();
     }, [])
 
-    useEffect(()=>{
-        setUploadedExcelData(null);
-    },[location])
-
     const __handleDataConnect = () => {
         return {
             searchExcelTranslatorHeader: async function () {
-                await excelTranslatorDataConnect().searchList()
+                await excelTranslatorDataConnect().searchAll()
                     .then(res => {
-                        if (res.status === 200 && res.data && res.data.message === 'success') {
-                            setExcelTranslatorHeaderList(res.data.data);
-                        }
-                    })
-                    .catch(err => {
-                        let res = err.response;
-                        alert(res?.data?.message);
-                    });
-            },
-            createTranslatorHeaderTitle: async function (headerTitle) {
-                await excelTranslatorDataConnect().postOne(headerTitle)
-                    .then(res => {
-                        if (res.status === 200 && res.data && res.data.message === 'success') {
-                            alert('저장되었습니다.');
-                            this.searchExcelTranslatorHeader();
-                        }
-                    })
-                    .catch(err => {
-                        let res = err.response;
-                        alert(res?.data?.message);
-                    });
-            },
-            modifyTranslatorHeaderTitle: async function (headerTitle) {
-                await excelTranslatorDataConnect().putOne(headerTitle)
-                    .then(res => {
-                        if (res.status === 200 && res.data && res.data.message === 'success') {
-                            alert('수정되었습니다.');
-                            this.searchExcelTranslatorHeader();
-                        }
-                    })
-                    .catch(err => {
-                        let res = err.response;
-                        alert(res?.data?.message);
-                    });
-            },
-            deleteTranslatorHeaderTitle: async function (headerId) {
-                await excelTranslatorDataConnect().deleteOne(headerId)
-                    .then(res => {
-                        if (res.status === 200 && res.data && res.data.message === 'success') {
-                            alert('삭제되었습니다.');
-                            this.searchExcelTranslatorHeader();
+                        if (res.status === 200) {
+                            setExcelTranslatorHeaderList(res?.data?.data);
                         }
                     })
                     .catch(err => {
@@ -103,10 +59,10 @@ export default function ExcelTranslatorMain(props) {
                     });
             },
             uploadExcelFile: async function (uploadedFormData) {
-                await excelTranslatorDataConnect().postFile(uploadedFormData)
+                await excelTranslatorDataConnect().uploadFile(uploadedFormData)
                     .then(res => {
-                        if (res.status === 200 && res.data && res.data.message === 'success') {
-                            setUploadedExcelData(res.data.data);
+                        if (res.status === 200) {
+                            setUploadedExcelData(res?.data?.data);
                         }
                     })
                     .catch(err => {
@@ -117,9 +73,8 @@ export default function ExcelTranslatorMain(props) {
             createUploadHeaderDetails: async function (uploadHeaderDetails) {
                 await excelTranslatorDataConnect().createUploadHeaderDetail(uploadHeaderDetails)
                     .then(res => {
-                        if (res.status === 200 && res.data && res.data.message === 'success') {
+                        if (res.status === 200) {
                             alert('완료되었습니다.');
-                            this.searchExcelTranslatorHeader();
                             setUploadedExcelData(null);
                         }
                     })
@@ -131,9 +86,8 @@ export default function ExcelTranslatorMain(props) {
             createDownloadHeaderDetails: async function (downloadHeaderDetails) {
                 await excelTranslatorDataConnect().createDownloadHeaderDetails(downloadHeaderDetails)
                     .then(res => {
-                        if (res.status === 200 && res.data && res.data.message === 'success') {
+                        if (res.status === 200) {
                             alert('저장되었습니다.');
-                            this.searchExcelTranslatorHeader();
                         }
                     })
                     .catch(err => {
@@ -174,137 +128,90 @@ export default function ExcelTranslatorMain(props) {
         }
     }
 
-    const __handleEventControl = () => {
-        return {
-            translatorHeaderTitle: function () {
-                return {
-                    submit: async function (headerTitle) {
-                        if(!isObjectSubmitted.createdHeader) {
-                            setIsObjectSubmitted({
-                                ...isObjectSubmitted,
-                                createdHeader: true
-                            });
+    const handleUploadExcelData = async (data) => {
+        // if(!isObjectSubmitted.createdUploadHeader) {
+        //     setIsObjectSubmitted({
+        //         ...isObjectSubmitted,
+        //         createdUploadHeader: true
+        //     });
 
-                            await __handleDataConnect().createTranslatorHeaderTitle(headerTitle);
+        //     await __handleDataConnect().uploadExcelFile(uploadedFormData);
 
-                            setIsObjectSubmitted({
-                                ...isObjectSubmitted,
-                                createdHeader: false
-                            });
-                        }
-                    },
-                    modify: async function (headerTitle) {
-                        await __handleDataConnect().modifyTranslatorHeaderTitle(headerTitle);
-                    },
-                    delete: async function (headerId) {
-                        await __handleDataConnect().deleteTranslatorHeaderTitle(headerId);
-                    }
-                }
-            },
-            uploadExcelData: function () {
-                return {
-                    submit: async function (uploadedFormData) {
-                        if(!isObjectSubmitted.createdUploadHeader) {
-                            setIsObjectSubmitted({
-                                ...isObjectSubmitted,
-                                createdUploadHeader: true
-                            });
-
-                            await __handleDataConnect().uploadExcelFile(uploadedFormData);
-
-                            setIsObjectSubmitted({
-                                ...isObjectSubmitted,
-                                createdUploadHeader: false
-                            });
-                        }
-                    },
-                    reset: function () {
-                        setUploadedExcelData(null);
-                    }
-                }
-            },
-            downloadTranslatedExcelFile: function () {
-                return {
-                    submit: async function (downloadHeaderDetail) {
-                        // 다운로드 양식으로 변경
-                        let excelData = downloadHeaderDetail.map(r => {
-                            return uploadedExcelData.map((data, idx) => {
-                                if (idx === 0) {
-                                    // 다운로드 헤더 이름 설정
-                                    let details = {
-                                        colData: r.headerName,
-                                        cellType: 'String'
-                                    }
-                                    return details;
-                                } else {
-                                    // 고정값 컬럼이라면
-                                    if (r.targetCellNumber === -1) {
-                                        let details = {
-                                            colData: r.fixedValue,
-                                            cellType: 'String'
-                                        };
-                                        return details;
-                                    } else {
-                                        return data.uploadedData.details[r.targetCellNumber];
-                                    }
-                                }
-                            });
-                        });
-
-                        // dto로 변경
-                        let translatedDetail = excelData.map(r => {
-                            let data = new TranslatedData().toJSON();
-                            data.translatedData.details = r;
-                            return data;
-                        })
-
-                        if(!isObjectSubmitted.createdDownloadHeader) {
-                            setIsObjectSubmitted({
-                                ...isObjectSubmitted,
-                                createdDownloadHeader: true
-                            });
-
-                            await __handleDataConnect().downloadTranslatedExcelFile(translatedDetail);
-
-                            setIsObjectSubmitted({
-                                ...isObjectSubmitted,
-                                createdDownloadHeader: false
-                            });
-                        }
-
-                    }
-                }
-            },
-            uploadHeaderDetails: function () {
-                return {
-                    submit: async function (uploadHeaderDetails) {
-                        await __handleDataConnect().createUploadHeaderDetails(uploadHeaderDetails);
-                        // TODO :: uploadHeaderDetail.details가 빈값일 때, downloadHeader도 빈 값으로 설정하자
-                    },
-                    download: async function (uploadHeaderDetails) {
-                        await __handleDataConnect().downloadUploadedHeaderDetails(uploadHeaderDetails);
-                    }
-                }
-            },
-            downloadHeaderDetails: function () {
-                return {
-                    submit: async function (downloadHeaderDetails) {
-                        await __handleDataConnect().createDownloadHeaderDetails(downloadHeaderDetails);
-                    }
-                }
-            }
-        }
+        //     setIsObjectSubmitted({
+        //         ...isObjectSubmitted,
+        //         createdUploadHeader: false
+        //     });
+        // }        
+        setBackdropLoading(true);
+        await __handleDataConnect().uploadExcelFile(data);
+        setBackdropLoading(false);
     }
 
-    const loadingControl = () => {
-        return {
-            open : function () {
-                setBackdropLoading(true);
-            },
-            close: function () {
-                setBackdropLoading(false);
-            }
-        }
+    const handleDownloadTranslatedExcelFile = async (downloadHeaderDetail) => {
+        let excelData = downloadHeaderDetail.map(r => {
+            return uploadedExcelData.map((data, idx) => {
+                if (idx === 0) {
+                    // 다운로드 헤더 이름 설정
+                    let details = {
+                        colData: r.headerName,
+                        cellType: 'String'
+                    }
+                    return details;
+                } else {
+                    // 고정값 컬럼이라면
+                    if (r.targetCellNumber === -1) {
+                        let details = {
+                            colData: r.fixedValue,
+                            cellType: 'String'
+                        };
+                        return details;
+                    } else {
+                        return data.uploadedData.details[r.targetCellNumber];
+                    }
+                }
+            });
+        });
+
+        // dto로 변경
+        let translatedDetail = excelData.map(r => {
+            let data = new TranslatedData().toJSON();
+            data.translatedData.details = r;
+            return data;
+        })
+
+        // if(!isObjectSubmitted.createdDownloadHeader) {
+        //     setIsObjectSubmitted({
+        //         ...isObjectSubmitted,
+        //         createdDownloadHeader: true
+        //     });
+
+        //     await __handleDataConnect().downloadTranslatedExcelFile(translatedDetail);
+
+        //     setIsObjectSubmitted({
+        //         ...isObjectSubmitted,
+        //         createdDownloadHeader: false
+        //     });
+        // }
+        await __handleDataConnect().downloadTranslatedExcelFile(translatedDetail);
+    }
+
+    const handleCreateUploadForm = async (uploadHeaderDetails) => {
+        setBackdropLoading(true);
+        await __handleDataConnect().createUploadHeaderDetails(uploadHeaderDetails);
+        await __handleDataConnect().searchExcelTranslatorHeader();
+        setBackdropLoading(false);
+        // TODO :: uploadHeaderDetail.details가 빈값일 때, downloadHeader도 빈 값으로 설정하자
+    }
+
+    const handleDownloadForUploadForm = async (uploadHeaderDetails) => {
+        setBackdropLoading(true);
+        await __handleDataConnect().downloadUploadedHeaderDetails(uploadHeaderDetails);
+        await __handleDataConnect().searchExcelTranslatorHeader();
+        setBackdropLoading(false);
+    }
+
+    const handleCreateDownloadForm = async (downloadHeaderDetails) => {
+        await __handleDataConnect().createDownloadHeaderDetails(downloadHeaderDetails);
     }
 
     return (
@@ -315,14 +222,10 @@ export default function ExcelTranslatorMain(props) {
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
                     uploadedExcelData={uploadedExcelData}
 
-                    loadingControl={loadingControl}
-                    createTranslatorHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().submit(headerTitle)}
-                    modifyTranslatorHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().modify(headerTitle)}
-                    deleteTranslatorHeaderTitleControl={(headerId) => __handleEventControl().translatorHeaderTitle().delete(headerId)}
-                    uploadExcelFileControl={(uploadedFormData) => __handleEventControl().uploadExcelData().submit(uploadedFormData)}
-                    downloadTranslatedExcelFileControl={(downloadHeaderDetail) => __handleEventControl().downloadTranslatedExcelFile().submit(downloadHeaderDetail)}
-                    resetUploadExcelFileControl={() => __handleEventControl().uploadExcelData().reset()}
-                    changeSelectedHeaderTitleControl={(headerTitle) => __handleEventControl().translatorHeaderTitle().changeSelectedHeaderTitle(headerTitle)}
+                    handleUploadExcelData={handleUploadExcelData}
+                    handleDownloadTranslatedExcelFile={handleDownloadTranslatedExcelFile}
+
+                    __searchTranslatorHeaderList={__handleDataConnect().searchExcelTranslatorHeader}
                 />
 
                 {/* 업로드 헤더 및 데이터 보드 */}
@@ -330,17 +233,15 @@ export default function ExcelTranslatorMain(props) {
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
                     uploadedExcelData={uploadedExcelData}
 
-                    loadingControl={loadingControl}
-                    createUploadHeaderDetailsControl={(uploadDetails) => __handleEventControl().uploadHeaderDetails().submit(uploadDetails)}
-                    downloadUploadHeaderDetailsControl={(uploadDetails) => __handleEventControl().uploadHeaderDetails().download(uploadDetails)}
+                    handleCreateUploadForm={handleCreateUploadForm}
+                    handleDownloadForUploadForm={handleDownloadForUploadForm}
                 />
 
                 {/* 다운로드 헤더 보드 */}
-
                 <DownloadContainerMain
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
 
-                    createDownloadHeaderDetailsControl={(downloadDetails) => __handleEventControl().downloadHeaderDetails().submit(downloadDetails)}
+                    handleCreateDownloadForm={handleCreateDownloadForm}
                 />
             </Container>
 

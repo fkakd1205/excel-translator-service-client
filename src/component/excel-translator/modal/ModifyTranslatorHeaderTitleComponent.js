@@ -123,7 +123,7 @@ const ModifyTranslatorHeaderTitleComponent = (props) => {
     return (
         <>
             <Container>
-                <form onSubmit={(e) => props.excelTranslatorHeaderControl().modify(e)}>
+                <form onSubmit={(e) => props.handleModifyTranslatorTitle(e)}>
                     <ItemContainer>
                         <ItemWrapper>
                             <ItemHeaderWrapper>

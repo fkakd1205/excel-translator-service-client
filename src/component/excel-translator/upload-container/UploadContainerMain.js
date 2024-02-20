@@ -269,7 +269,7 @@ export default function UploadContainerMain(props) {
                             payload: uploadDetails
                         });
 
-                        await props.createUploadHeaderDetailsControl(excelHeader);
+                        await props.handleCreateUploadForm(excelHeader);
 
                         onCreateTranslatorUploadHeaderDetailModalClose();
                     },
@@ -364,8 +364,6 @@ export default function UploadContainerMain(props) {
                     download: async function (e){
                         e.preventDefault();
 
-                        props.loadingControl().open();
-
                         let downloadDetail = selectedHeaderTitleState.uploadHeaderDetail.details.map(r => {
                             return {
                                 ...r,
@@ -373,8 +371,7 @@ export default function UploadContainerMain(props) {
                             }
                         });
 
-                        await props.downloadUploadHeaderDetailsControl(downloadDetail);
-                        props.loadingControl().close();
+                        await props.handleDownloadForUploadForm(downloadDetail);
                     }
                 }
             }
