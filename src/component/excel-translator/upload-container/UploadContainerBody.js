@@ -8,25 +8,25 @@ export default function UploadContainerBody(props) {
                 <BoardTitle>
                     <span>업로드 엑셀 헤더 및 데이터</span>
                     <DataOptionBox>
-                        <HeaderFormControlBtn type="button" className="upload-header-excel-download" onClick={(e) => props.excelFormControl().uploadedExcelForm().download(e)} disabled={!props.selectedHeaderTitleState?.uploadHeaderDetail.details.length}>양식 다운로드</HeaderFormControlBtn>
-                        <HeaderFormControlBtn type="button" onClick={(e) => props.excelFormControl().uploadedExcelForm().open(e)}>양식 설정</HeaderFormControlBtn>
+                        <HeaderFormControlBtn type="button" className="upload-header-excel-download" onClick={(e) => props.handleDownloadForm(e)} disabled={!props.selectedHeaderTitleState?.uploadHeaderDetail.details.length}>양식 다운로드</HeaderFormControlBtn>
+                        <HeaderFormControlBtn type="button" onClick={() => props.onCreateHeaderModalOpen()}>양식 설정</HeaderFormControlBtn>
                     </DataOptionBox>
                 </BoardTitle>
                 <BoardContainer>
                     <table className="table table-sm" style={{ tableLayout: 'fixed', width: '100%' }}>
                         <thead>
                             <tr>
-                                {props.uploadedExcelHeaderDataState?.map((data, idx) => {
+                                {props.selectedHeaderTitleState?.uploadHeaderDetail?.details.map((data, idx) => {
                                     return (
                                         <HeaderTh key={'upload_header_idx' + idx} className="fixed-header large-cell" scope="col">
-                                            <span>{data.colData}</span>
+                                            <span>{data.headerName}</span>
                                         </HeaderTh>
                                     )
                                 })}
                             </tr>
                         </thead>
                         <tbody style={{ border: 'none' }}>
-                            {props.uploadedExcelDataState?.map((data, idx) => {
+                            {props.uploadedExcelData?.map((data, idx) => {
                                 return (
                                     <BodyTr
                                         key={'upload_exel_data_idx' + idx}

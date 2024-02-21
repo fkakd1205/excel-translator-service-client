@@ -198,6 +198,8 @@ export default function ControlBarMain(props) {
         await __dataConnectControl().deleteTranslatorHeader(selectedHeader.id);
         await props.__searchTranslatorHeaderList();
 
+        delete query.headerId
+        
         navigate({
             pathname: location.pathname,
             search: `?${createSearchParams({ ...query })}`,
@@ -212,6 +214,11 @@ export default function ControlBarMain(props) {
         // 헤더 타이틀을 선택하지 않은 경우
         if (!selectedHeader) {
             alert('헤더 형식을 먼저 선택해주세요.');
+            return;
+        }
+
+        if (!(selectedHeader.uploadHeaderDetail.details.length > 0)) {
+            alert('업로드 엑셀 양식을 먼저 설정해주세요.')
             return;
         }
 
