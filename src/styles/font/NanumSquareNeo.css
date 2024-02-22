@@ -1,0 +1,6 @@
+@font-face {
+    font-family: 'NanumSquareNeo';
+    src: url('/public/assets/fonts/nanum-square-neo/NanumSquareNeo-Variable.woff2');
+    font-variation-settings: 'wght' normal;
+    font-style: normal;
+}

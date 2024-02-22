@@ -1,4 +1,12 @@
+@import url(./font/NanumSquareNeo.css);
+
 :root {
-    --main-color: #d5dae9;
+    --main-color: #D5DAE9;
+    --main-color2: #bcc1cf;
+    --main-color3: #9ba7ce;
     --background-color: #fdfdfe;
+}
+
+body * {
+    font-family: 'NanumSquareNeo';
 }

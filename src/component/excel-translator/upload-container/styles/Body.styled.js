@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-    padding: 0 2%;
+    margin-bottom: 30px;
 `;
 
 export const BoardTitle = styled.div`
@@ -99,7 +99,7 @@ export const HeaderTh = styled.th`
     vertical-align: middle !important;
     text-align: center;
     width: 150px;
-    border-right: 1px solid #efefef;
+    border-right: 1px solid #ffffff;
 `;
 
 export const BodyTr = styled.tr`

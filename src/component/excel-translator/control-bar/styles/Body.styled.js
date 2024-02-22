@@ -1,27 +1,23 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
 `;
 
 export const TitleSelector = styled.div`
-    display: grid;
-    grid-template-columns: 50% auto;
-    padding: 20px 0px;
+    display: flex;
     text-align: center;
     align-items: center;
-
-    @media only screen and (max-width: 992px) {
-        padding: 10px;
-        grid-template-columns: 100%;
-        row-gap: 20px;
-        place-content: center;
-    }
 `;
 
 export const FormInput = styled.div`
     color: black;
     display: flex;
-    vertical-align: middle;
+    width: 400px;
+    height: 55px;
 
     @media only screen and (max-width: 992px) {
         font-size: 10px;
@@ -30,11 +26,11 @@ export const FormInput = styled.div`
 `;
 
 export const TitleControlBtn = styled.button`
-    height: 50px;
-    width: 50px;
-    background: #989fb7;
+    height: 55px;
+    width: 55px;
+    background: var(--main-color2);
     color:white;
-    border:1px solid #989fb7;
+    border:1px solid var(--main-color2);
     border-radius: 3px;
     margin-left: 10px;
     padding: 10px;
@@ -47,59 +43,31 @@ export const TitleControlBtn = styled.button`
     @media only screen and (max-width: 992px) {
         padding: 6px;
     }
-`;
-
-export const DataContainer = styled.div`
-`;
-
-export const TranslatorBtnBox = styled.div`
-    padding: 0 3%;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    text-align: center;
-    align-items: center;
-
-    @media only screen and (max-width: 992px){
-        grid-template-columns: 100%;
-    }
-`;
-
-export const Form = styled.form`
-    margin: 10px;
-
-    @media only screen and (max-width: 992px){
-        margin: 0 auto;
-        width: 100%;
-    }
-`;
+`
 
 export const FromGroup = styled.div`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    column-gap: 20px;
-    text-align: center;
+    display: flex;
+    gap: 15px;
     align-items: center;
+    height: 55px;
+    font-size: 18px;
 
-
-    @media only screen and (max-width: 992px){
-        grid-template-columns: none;
-        grid-template-rows: repeat(1, 1fr);
+    .button-box {
+        width: 250px;
+        height: 100%;
     }
 `;
 
 export const ControlLabel = styled.label`
-    font-size: 1rem;
-    display: inline-block;
-    margin: 4px;
     width: 100%;
-    padding: 3% 0%;
+    height: 100%;
     color: white;
+    font-weight: 600;
     text-align: center;
-    vertical-align: middle;
-    background-color: #a9b3d5;
+    background-color: var(--main-color3);
     border-radius: 3px;
     transition: 0.15s linear;
-    font-weight: 600;
+    line-height: 55px;
 
     &:hover {
         opacity: 0.8;
@@ -120,17 +88,14 @@ export const ControlLabel = styled.label`
 `;
 
 export const ControlBtn = styled.button`
-    font-size: 1rem;
     width: 100%;
-    padding: 3% 0%;
-    margin: 4px;
+    height: 100%;
     color: white;
-    vertical-align: middle;
-    background-color: #a9b3d5;
+    font-weight: 600;
+    background-color: var(--main-color3);
     border-radius: 3px;
     border: none;
     transition: 0.15s linear;
-    font-weight: 600;
 
     &:hover {
         opacity: 0.8;

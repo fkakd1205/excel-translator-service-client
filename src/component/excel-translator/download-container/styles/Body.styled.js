@@ -1,8 +1,7 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-    padding: 2%;
-    padding-bottom: 100px;
+    margin-bottom: 30px;
 `;
 
 export const BoardTitle = styled.div`
@@ -74,7 +73,7 @@ export const HeaderTh = styled.th`
     vertical-align: middle !important;
     text-align: center;
     width: 150px;
-    border-right: 1px solid #efefef;
+    border-right: 1px solid #ffffff;
 `;
 
 export const StoreBtn = styled.button`
