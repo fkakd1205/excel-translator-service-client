@@ -1,10 +1,10 @@
 import { useEffect, useReducer, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import queryString from 'query-string';
-import ExcelTranslatorCommonModal from "../modal/ExcelTranslatorCommonModal";
-import CreateTranslatorUploadHeaderDetailComponent from "../modal/CreateTranslatorUploadHeaderDetailComponent";
+import ExcelTranslatorCommonModal from "../../modal/CommonModal";
 import { useLocation } from "react-router-dom";
 import UploadContainerBody from "./UploadContainerBody";
+import CreateUploadHeaderModal from "./modal/CreateUploadHeaderModal";
 
 class UploadHeaderDetail {
     constructor() {
@@ -312,7 +312,7 @@ export default function UploadContainerMain(props) {
                 maxWidth={'xs'}
                 fullWidth={true}
             >
-                <CreateTranslatorUploadHeaderDetailComponent
+                <CreateUploadHeaderModal
                     createUploadHeaderDetailState={createUploadHeaderDetailState}
 
                     handleCreateUploadHeader={(e) => handleCreateUploadHeader(e)}
@@ -321,7 +321,7 @@ export default function UploadContainerMain(props) {
                     handleAddCell={(e) => handleAddCell(e)}
                     handleMoveCellUp={(e, detailId) => handleMoveCellUp(e, detailId)}
                     handleMoveCellDown={(e, detailId) => handleMoveCellDown(e, detailId)}
-                ></CreateTranslatorUploadHeaderDetailComponent>
+                ></CreateUploadHeaderModal>
             </ExcelTranslatorCommonModal>
         </>
     )

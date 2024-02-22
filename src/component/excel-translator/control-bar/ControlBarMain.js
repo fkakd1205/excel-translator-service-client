@@ -1,12 +1,12 @@
 import { useEffect, useReducer, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import queryString from 'query-string';
-import CreateTranslatorHeaderTitleComponent from "../modal/CreateTranslatorHeaderTitleComponent";
-import ExcelTranslatorCommonModal from "../modal/ExcelTranslatorCommonModal";
-import ModifyTranslatorHeaderTitleComponent from "../modal/ModifyTranslatorHeaderTitleComponent";
+import ExcelTranslatorCommonModal from "../../modal/CommonModal";
 import ControlBarBody from "./ControlBarBody";
 import { createSearchParams, useLocation, useNavigate } from "react-router-dom";
 import { excelTranslatorDataConnect } from "../../../data-connect/excelTranslatorDataConnect";
+import CreateTranslatorModal from "./modal/CreateTranslatorModal";
+import ModifyTranslatorModal from "./modal/ModifyTranslatorModal";
 
 class ExcelTranslatorHeader {
     constructor() {
@@ -316,12 +316,12 @@ export default function ControlBarMain(props) {
                 maxWidth={'xs'}
                 fullWidth={true}
             >
-                <CreateTranslatorHeaderTitleComponent
+                <CreateTranslatorModal
                     excelTitleInfo={excelTitleInfo}
 
                     onChangeInputValue={onChangeInputValue}
                     handleCreateTranslatorTitle={handleCreateTranslatorTitle}
-                ></CreateTranslatorHeaderTitleComponent>
+                ></CreateTranslatorModal>
             </ExcelTranslatorCommonModal>
 
             {/* Modify Header Title Modal */}
@@ -331,12 +331,12 @@ export default function ControlBarMain(props) {
                 maxWidth={'xs'}
                 fullWidth={true}
             >
-                <ModifyTranslatorHeaderTitleComponent
+                <ModifyTranslatorModal
                     excelTitleInfo={excelTitleInfo}
 
                     onChangeInputValue={onChangeInputValue}
                     handleModifyTranslatorTitle={handleModifyTranslatorTitle}
-                ></ModifyTranslatorHeaderTitleComponent>
+                ></ModifyTranslatorModal>
             </ExcelTranslatorCommonModal>
         </>
     )

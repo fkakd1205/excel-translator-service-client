@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import logo from './logo.svg';
 import './App.css';
+import './styles/global.css';
 
 import { ThemeProvider } from "@material-ui/core/styles";
 import { unstable_createMuiStrictModeTheme } from '@material-ui/core/styles';
