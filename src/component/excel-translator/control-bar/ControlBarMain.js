@@ -123,8 +123,29 @@ export default function ControlBarMain(props) {
         });
     }
 
+    const checkTitleSubmitForm = () => {
+        if (!excelTitleInfo.uploadHeaderTitle) {
+            throw Error('업로드 엑셀 이름을 입력해주세요.')
+        }
+        
+        if (!excelTitleInfo.downloadHeaderTitle) {
+            throw Error('다운로드 엑셀 이름을 입력해주세요.')
+        }
+
+        if (!excelTitleInfo.rowStartNumber) {
+            throw Error('데이터 시작 행을 입력해주세요.')
+        }
+    }
+
     const handleCreateTranslatorTitle = async (e) => {
         e.preventDefault();
+        
+        try {
+            checkTitleSubmitForm();
+        } catch (e) {
+            alert(e.message);
+            return;
+        }
 
         // 엑셀 타이틀 정보 설정 (업로드 타이틀, 다운로드 타이틀, 데이터 시작 행)
         let excelHeader = new ExcelTranslatorHeader().toJSON();
@@ -139,20 +160,19 @@ export default function ControlBarMain(props) {
         await props.__searchTranslatorHeaderList();
 
         // 새로 생성된 타이틀 형식이 선택되도록 설정.
-        query.headerId = excelHeader.id
-
-        navigate({
-            pathname: location.pathname,
-            search: `?${createSearchParams({...query})}`,
-        }, {
-            replace: true
-        })
-        
+        handleChangeHeaderId(excelHeader.id);
         onCreateUploadExcelHeaderModalClose();
     }
 
     const handleModifyTranslatorTitle = async (e) => {
         e.preventDefault();
+
+        try {
+            checkTitleSubmitForm();
+        } catch (e) {
+            alert(e.message);
+            return;
+        }
 
         // 엑셀 타이틀 정보 설정 (업로드 타이틀, 다운로드 타이틀, 데이터 시작 행)
         let excelHeader = new ExcelTranslatorHeader().toJSON();
@@ -169,11 +189,8 @@ export default function ControlBarMain(props) {
         onModifyUploadExcelHeaderModalClose();
     }
 
-    const handleChangeSelectedHeader = (e) => {
-        e.preventDefault();
-
-        let selectedHeaderId = props.excelTranslatorHeaderList.find(r => r.id === e.target.value).id;
-        query.headerId = selectedHeaderId
+    const handleChangeHeaderId = (id) => {
+        query.headerId = id
 
         navigate({
             pathname: location.pathname,
@@ -181,6 +198,12 @@ export default function ControlBarMain(props) {
         }, {
             replace: true
         })
+    }
+
+    const handleChangeSelectedHeader = (e) => {
+        e.preventDefault();
+        let headerId = props.excelTranslatorHeaderList.find(r => r.id === e.target.value).id;
+        handleChangeHeaderId(headerId)
     }
 
     const handleDeleteTranslatorForm = async (e) => {
@@ -269,7 +292,7 @@ export default function ControlBarMain(props) {
                     });
             },
             modifyTranslatorHeader: async function (headerTitle) {
-                await excelTranslatorDataConnect().putOne(headerTitle)
+                await excelTranslatorDataConnect().changeOne(headerTitle)
                     .then(res => {
                         if (res.status === 200 && res.data && res.data.message === 'success') {
                             alert('수정되었습니다.');

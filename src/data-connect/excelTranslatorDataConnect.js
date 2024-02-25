@@ -12,13 +12,13 @@ const excelTranslatorDataConnect = () => {
                 withCredentials: true
             })
         },
-        putOne: async function (headerTitle) {
+        changeOne: async function (headerTitle) {
             return await axios.put(`api/v1/excel-translator/one`, headerTitle, {
                 withCredentials: true
             })
         },
         deleteOne: async function (headerId) {
-            return await axios.delete(`api/v1/excel-translator/one`, {
+            return await axios.delete(`api/v1/excel-translator/one/${headerId}`, {
                 params: {
                     headerId: headerId
                 },

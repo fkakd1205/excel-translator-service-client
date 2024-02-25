@@ -6,13 +6,14 @@ export default function UploadContainerBody(props) {
         <>
             <Container>
                 <BoardTitle>
-                    <span>업로드 엑셀 헤더 & 데이터</span>
+                    <div>업로드 엑셀 헤더 & 데이터</div>
                     <DataOptionBox>
                         <HeaderFormControlBtn type="button" className="upload-header-excel-download" onClick={(e) => props.handleDownloadForm(e)} disabled={!props.selectedHeaderTitleState?.uploadHeaderDetail.details.length}>양식 다운로드</HeaderFormControlBtn>
                         <HeaderFormControlBtn type="button" onClick={() => props.onCreateHeaderModalOpen()}>양식 설정</HeaderFormControlBtn>
                     </DataOptionBox>
                 </BoardTitle>
                 <BoardContainer>
+                    {props.selectedHeaderTitleState?.uploadHeaderDetail?.details.length == 0 && <div className='info-text'>업로드 엑셀 헤더 양식을 설정해주세요.</div>}
                     <table className="table table-sm" style={{ tableLayout: 'fixed', width: '100%' }}>
                         <thead>
                             <tr>

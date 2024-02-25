@@ -71,7 +71,7 @@ export const CreateContainer = styled.div`
 `;
 
 export const CreateBtn = styled.button`
-    background: #aab3cdee;
+    background: var(--main-color);
     border:none;
     margin: 0 auto;
     width: 40px;

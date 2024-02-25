@@ -112,25 +112,27 @@ export default function UploadContainerMain(props) {
     }, [selectedHeaderTitleState, props.uploadedExcelData]);
 
     const onCreateHeaderModalOpen = () => {
+        if (!selectedHeaderTitleState) {
+            alert('헤더 형식을 먼저 선택해주세요.');
+            return;
+        }
+
+        let createHeaderData = {}
         // 이미 등록된 헤더 양식이 있는 경우
         if(selectedHeaderTitleState?.uploadHeaderDetail.details.length > 0) {
-            let createHeaderData = {
+            createHeaderData = {
                 uploadedData: {
-                    details : selectedHeaderTitleState?.uploadHeaderDetail.details
+                    details : [...selectedHeaderTitleState?.uploadHeaderDetail.details]
                 }
             }
-
-            dispatchCreateUploadHeaderDetailState({
-                type: 'INIT_DATA',
-                payload: createHeaderData
-            });
-        }else if(props.uploadedExcelData) {     // 업로드된 엑셀 파일이 있는 경우
-            dispatchCreateUploadHeaderDetailState({
-                type: 'INIT_DATA',
-                payload: props.uploadedExcelData[0]
-            });
+        // }else if(props.uploadedExcelData) {     // 업로드된 엑셀 파일이 있는 경우
+        //     createHeaderData = {
+        //         uploadedData: {
+        //             details : [props.uploadedExcelData[0]]
+        //         }
+        //     }
         }else {     // 새로운 양식을 만들 경우
-            let createHeaderData = {
+            createHeaderData = {
                 id: uuidv4(),
                 uploadedData : {
                     details : [{
@@ -140,13 +142,12 @@ export default function UploadContainerMain(props) {
                     }]
                 }
             }
-
-            dispatchCreateUploadHeaderDetailState({
-                type: 'INIT_DATA',
-                payload: createHeaderData
-            })
         }
 
+        dispatchCreateUploadHeaderDetailState({
+            type: 'INIT_DATA',
+            payload: createHeaderData
+        })
         setCreateHeaderModalOpen(true);
     }
 
@@ -284,6 +285,7 @@ export default function UploadContainerMain(props) {
     const handleDownloadForm = async (e) => {
         e.preventDefault();
 
+        // TODO :: colData로 변환하지 않고 다운로드 할 수 있는 방법 생각해보기
         let downloadDetail = selectedHeaderTitleState.uploadHeaderDetail.details.map(r => {
             return {
                 ...r,
@@ -291,7 +293,7 @@ export default function UploadContainerMain(props) {
             }
         });
 
-        await props.handleDownloadForUploadForm(downloadDetail);
+        await props.handleDownloadForUploadForm(selectedHeaderTitleState, downloadDetail);
     }
 
     return (
@@ -305,7 +307,7 @@ export default function UploadContainerMain(props) {
                 handleDownloadForm={handleDownloadForm}
             />
 
-            {/* Create Upload Header Form Check Modal */}
+            {/* 업로드 엑셀 헤더 설정 모달창 */}
             <ExcelTranslatorCommonModal
                 open={createHeaderModalOpen}
                 onClose={() => onCreateHeaderModalClose()}

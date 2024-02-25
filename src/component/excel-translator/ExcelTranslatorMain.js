@@ -6,6 +6,7 @@ import { Container } from './styles/Body.styled';
 import ControlBarMain from './control-bar/ControlBarMain';
 import DownloadContainerMain from './download-container/DownloadContainerMain';
 import UploadContainerMain from './upload-container/UploadContainerMain';
+import { dateToYYMMDD } from '../../handler/dateHandler';
 
 class TranslatedData {
     constructor() {
@@ -102,14 +103,17 @@ export default function ExcelTranslatorMain(props) {
                         console.log(err);
                     });
             },
-            downloadUploadedHeaderDetails: async function (uploadedDetails) {
+            downloadUploadedHeaderDetails: async function (titleData, uploadedDetails) {
+                let date = new Date()
+                let fileName = `[${dateToYYMMDD(date)}]${titleData.uploadHeaderTitle}_${titleData.downloadHeaderTitle}`
+
                 await excelTranslatorDataConnect().downloadUploadedHeaderDetails(uploadedDetails)
                     .then(res => {
                         const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
                         const link = document.createElement('a');
                         link.href = url;
 
-                        link.setAttribute('download', '엑셀 형식 다운로드.xlsx');
+                        link.setAttribute('download',  `${fileName}.xlsx`);
                         document.body.appendChild(link);
                         link.click();
                     })
@@ -168,9 +172,9 @@ export default function ExcelTranslatorMain(props) {
         setBackdropLoading(false);
     }
 
-    const handleDownloadForUploadForm = async (uploadHeaderDetails) => {
+    const handleDownloadForUploadForm = async (titleData, uploadHeaderDetails) => {
         setBackdropLoading(true);
-        await __handleDataConnect().downloadUploadedHeaderDetails(uploadHeaderDetails);
+        await __handleDataConnect().downloadUploadedHeaderDetails(titleData,uploadHeaderDetails);
         await __handleDataConnect().searchExcelTranslatorHeader();
         setBackdropLoading(false);
     }

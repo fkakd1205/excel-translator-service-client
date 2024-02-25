@@ -7,15 +7,10 @@ export const Container = styled.div`
 export const BoardTitle = styled.div`
     font-size: large;
     color: rgba(000, 102, 153, 0.9);
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    display: flex;
     align-items: center;
-    padding: 10px;
-
-    @media only screen and (max-width: 992px){
-        grid-template-columns: 1fr;
-        row-gap: 10px;
-    }
+    justify-content: space-between;
+    padding: 10px 0;
     
     @media only screen and (max-width:576px){
         font-size: 16px;
@@ -27,19 +22,19 @@ export const BoardTitle = styled.div`
 `;
 
 export const DataOptionBox = styled.span`
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    align-items: center;
     column-gap: 10px;
 
     & .upload-header-excel-download {
-        background: #c0bff3;
-        border: 1px solid #c0bff3;
+        background: #ffffff;
+        border: 1px solid #5b5b5b;
+        color: #5b5b5b;
 
         &:hover{
             cursor: pointer;
             transition: 0.2s;
             transform: scale(1.05);
-            background: #a5a3ff;
         }
 
         &:active{
@@ -67,7 +62,13 @@ export const BoardContainer = styled.div`
     overflow: auto;
     border-radius: 5px;
     font-size: 14px;
-    box-shadow: 1px 1px 15px #a9b3d599;
+    box-shadow: 1px 1px 10px #a9b3d599;
+
+    .info-text {
+        text-align: center;
+        padding: 10px;
+        color: #8b8b8b;
+    }
 
     & .fixed-header {
         position: sticky;
@@ -100,6 +101,10 @@ export const HeaderTh = styled.th`
     text-align: center;
     width: 150px;
     border-right: 1px solid #ffffff;
+
+    :last-child {
+        border-right: none;
+    }
 `;
 
 export const BodyTr = styled.tr`
@@ -114,33 +119,24 @@ export const BodyTd = styled.td`
 `;
 
 export const HeaderFormControlBtn = styled.button`
-    padding: 2%;
-    background: rgb(179 199 219);
-    color: white;
+    padding: 5px;
+    width: 180px;
+    background: #ffffff;
+    color: #5b5b5b;
     font-size: 1em;
     font-weight: 500;
-    border:1px solid rgb(179 199 219);
+    border:1px solid #5b5b5b;
     border-radius: 20px;
     float: right;
-
-    @media only screen and (max-width: 992px){
-        display: inline-block;
-        padding: 4px;
-    }
-
-    @media only screen and (max-width:576px ){
-        padding: 0;
-    }
+    transition: 0.2s all;
 
     &:hover{
         cursor: pointer;
-        transition: 0.2s;
-        transform: scale(1.05);
-        background: rgb(160 180 200);
+        transform: scale(1.025);
     }
 
     &:active{
         transition: 0s;
-        transform: scale(1.05);
+        transform: scale(1.025);
     }
 `;

@@ -5,12 +5,13 @@ export default function DownloadContainerBody(props) {
         <>
             <Container>
                 <BoardTitle>
-                    <span>다운로드 엑셀 헤더</span>
+                    <div>다운로드 엑셀 헤더</div>
                     <DataOptionBox>
                         <StoreBtn type="button" onClick={(e) => props.onCreateHeaderModalOpen(e)}>양식 설정</StoreBtn>
                     </DataOptionBox>
                 </BoardTitle>
                 <BoardContainer>
+                    {props.selectedHeader?.downloadHeaderDetail?.details.length == 0 && <div className='info-text'>다운로드 엑셀 헤더 양식을 설정해주세요.</div>}
                     <table className="table table-sm" style={{ tableLayout: 'fixed', width: '100%', marginBottom: '0' }}>
                         <thead>
                             <tr>
