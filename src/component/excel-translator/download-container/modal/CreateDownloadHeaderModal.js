@@ -23,14 +23,10 @@ export default function CreateDownloadHeaderModal(props) {
         <>
             <Container>
                 <form onSubmit={(e) => props.handleCreateDownloadHeader(e)}>
-                    <ItemContainer>
-                        <ItemWrapper>
-                            <ItemHeaderWrapper>
-                                <GroupTitle>다운로드 엑셀 유형 등록</GroupTitle>
-                                <CreateBtn type='submit'><AddTaskIcon /></CreateBtn>
-                            </ItemHeaderWrapper>
-                        </ItemWrapper>
-                    </ItemContainer>
+                    <div className='modal-header'>
+                        <GroupTitle>다운로드 엑셀 양식</GroupTitle>
+                        <CreateBtn type='submit'><AddTaskIcon /></CreateBtn>
+                    </div>
                     <BodyContainer>
                         <DataContainer>
                             {props.updateDownloadHeaderForm?.downloadHeaderDetail?.details.map((downloadHeader, idx) => {
@@ -39,9 +35,11 @@ export default function CreateDownloadHeaderModal(props) {
                                 return (
                                     <React.Fragment key={downloadHeader.id}>
                                         <DataWrapper>
-                                            <DeleteBox>
-                                                <DeleteBtn><CancelIcon type="button" sx={{ fontSize: 33 }} onClick={(e) => props.handleRemoveCell(e, downloadHeader.id)} /></DeleteBtn>
-                                            </DeleteBox>
+                                            <DeleteBtn>
+                                                <button type='button' className='button-el' onClick={(e) => props.handleRemoveCell(e, downloadHeader.id)}>
+                                                    <img src="./assets/icons/delete_ffffff.svg" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}/>
+                                                </button>
+                                            </DeleteBtn>
                                             <DataGroup>
                                                 <UploadDataGroup>
                                                     <div>{idx + 1}.</div>

@@ -1,6 +1,15 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
+    .modal-header {
+        background:white;
+        border-radius: 5px;
+        border-bottom: 1px solid #5961c788;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding:15px;
+    }
 `;
 
 export const ItemContainer = styled.div`
@@ -44,6 +53,7 @@ export const BodyContainer = styled.div`
 `;
 
 export const DataWrapper = styled.div`
+    position: relative;
     margin-bottom: 10px;
     border-radius: 10px;
     padding: 10px 16px 30px 16px;
@@ -120,14 +130,10 @@ export const DownloadInfo = styled.div`
     border-radius: 10px;
 `;
 
-export const DeleteBox = styled.div`
-    text-align: right;
-    width: 100%;
-`;
-
-export const DeleteBtn = styled.span`
-    color: #ff7979;
-    margin-bottom: 5px;
+export const DeleteBtn = styled.div`
+    position: absolute;
+    top: -10px;
+    right: -10px;
 
     &:hover{
         transform: scale(1.1);
@@ -141,6 +147,14 @@ export const DeleteBtn = styled.span`
         transform: scale(1.05);
 
         color: #ffbaba;
+    }
+
+    .button-el {
+        background-color: var(--default-red-color);
+        border: 1px solid var(--default-red-color);
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
     }
 `;
 
@@ -191,7 +205,6 @@ export const FormInput = styled.div`
 export const CreateBtn = styled.button`
     background: var(--main-color);
     border:none;
-    margin: 0 auto;
     width: 40px;
     height: 40px;
     border-radius: 50%;

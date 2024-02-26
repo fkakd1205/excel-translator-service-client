@@ -28,7 +28,7 @@ export const FormInput = styled.div`
 export const TitleControlBtn = styled.button`
     height: 55px;
     width: 55px;
-    background: var(--main-color2);
+    background-color: var(--main-color2);
     color:white;
     border:1px solid var(--main-color2);
     border-radius: 3px;

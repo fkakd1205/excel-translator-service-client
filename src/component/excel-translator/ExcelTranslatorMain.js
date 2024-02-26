@@ -4,8 +4,8 @@ import { excelTranslatorDataConnect } from '../../data-connect/excelTranslatorDa
 import BackdropLoading from '../loading/BackdropLoading';
 import { Container } from './styles/Body.styled';
 import ControlBarMain from './control-bar/ControlBarMain';
-import DownloadContainerMain from './download-container/DownloadContainerMain';
 import UploadContainerMain from './upload-container/UploadContainerMain';
+import DownloadContainerMain from './download-container/DownloadContainerMain';
 import { dateToYYMMDD } from '../../handler/dateHandler';
 
 class TranslatedData {

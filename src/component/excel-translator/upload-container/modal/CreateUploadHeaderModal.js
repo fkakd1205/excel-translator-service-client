@@ -1,30 +1,25 @@
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import CancelIcon from '@mui/icons-material/Cancel';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { BodyContainer, Container, CreateBtn, CreateContainer, CreateHeaderInfo, DataText, GroupTitle, IndexChangeBtn, ItemContainer, ItemHeaderWrapper, ItemWrapper, DataInputEl, DeleteBox, DeleteBtn, CustomDataGroup } from "./styles/CreateUploadHeader.styled";
+import { BodyContainer, Container, CreateBtn, CreateContainer, CreateHeaderInfo, DataText, GroupTitle, IndexChangeBtn, DataInputEl, DeleteBtn, CustomDataGroup } from "./styles/CreateUploadHeader.styled";
 
 export default function CreateUploadHeaderModal(props) {
     return (
         <>
             <Container>
                 <form onSubmit={(e) => props.handleCreateUploadHeader(e)}>
-                    <ItemContainer>
-                        <ItemWrapper>
-                            <ItemHeaderWrapper>
-                                <GroupTitle>엑셀 양식 저장</GroupTitle>
-                                <CreateBtn type='submit'><AddTaskIcon /></CreateBtn>
-                            </ItemHeaderWrapper>
-                        </ItemWrapper>
-                    </ItemContainer>
+                    <div className='modal-header'>
+                        <GroupTitle>업로드 엑셀 양식</GroupTitle>
+                        <CreateBtn type='submit'><AddTaskIcon /></CreateBtn>
+                    </div>
                     <BodyContainer>
                         <CreateContainer>
-                            {props.createUploadHeaderDetailState?.uploadedData.details?.map((data, idx) => {
+                            {props.headerDetails?.map((data, idx) => {
                                 return (
                                     <CreateHeaderInfo key={'create_header_detail_idx' + idx} className="input-group mb-3">
                                         <DataText>
-                                            <div>
+                                            <div style={{ width: '50px', textAlign: 'center' }}>
                                                 <IndexChangeBtn onClick={(e) => props.handleMoveCellUp(e, data.id)}>
                                                     <ExpandLessIcon />
                                                 </IndexChangeBtn>
@@ -32,16 +27,16 @@ export default function CreateUploadHeaderModal(props) {
                                                     <ExpandMoreIcon />
                                                 </IndexChangeBtn>
                                             </div>
-                                            <span>{idx + 1}.</span>
-                                            <DataInputEl type="text" name='headerName' placeholder='업로드 엑셀 항목명' onChange={(e) => props.onChangeDetailInputValue(e, data.id)} value={data.headerName || data.colData || ''} required></DataInputEl>
-                                        </DataText>
-                                        <DeleteBox>
+                                            <div style={{ flex: 1, width: '100%', display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+                                                <div>{idx + 1}.</div>
+                                                <DataInputEl type="text" name='headerName' placeholder='업로드 엑셀 항목명' onChange={(e) => props.onChangeDetailInputValue(e, data.id)} value={data.headerName || data.colData || ''} required></DataInputEl>
+                                            </div>
                                             <DeleteBtn>
-                                                <CancelIcon type="button" sx={{ fontSize: 33 }}
-                                                    onClick={(e) => props.handleRemoveCell(e, data.id)}
-                                                />
+                                                <button type='button' className='button-el' onClick={(e) => props.handleRemoveCell(e, data.id)}>
+                                                    <img src="./assets/icons/delete_f76868.svg" />
+                                                </button>
                                             </DeleteBtn>
-                                        </DeleteBox>
+                                        </DataText>
                                     </CreateHeaderInfo>
                                 )
                             })}

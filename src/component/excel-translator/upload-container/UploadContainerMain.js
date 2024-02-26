@@ -25,7 +25,6 @@ class UploadHeaderDetail {
 }
 
 const initialSelectedHeaderTitleState = null;
-const initialCreateUploadHeaderDetailState = null;
 
 const selectedHeaderTitleStateReducer = (state, action) => {
     switch (action.type) {
@@ -45,32 +44,15 @@ const selectedHeaderTitleStateReducer = (state, action) => {
     }
 }
 
-const createUploadHeaderDetailStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'INIT_DATA':
-            return action.payload;
-        case 'SET_UPLOAD_HEADER_DETAIL_DATA':
-            return {
-                ...state,
-                uploadedData: {
-                    ...state.uploadedData,
-                    details: action.payload
-                }
-            }
-        case 'CLEAR':
-            return null;
-        default: return { ...state }
-    }
-}
-
 export default function UploadContainerMain(props) {
     const location = useLocation()
     let query = queryString.parse(location.search);
 
     const [createHeaderModalOpen, setCreateHeaderModalOpen] = useState(false);
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
-    const [createUploadHeaderDetailState, dispatchCreateUploadHeaderDetailState] = useReducer(createUploadHeaderDetailStateReducer, initialCreateUploadHeaderDetailState);
+    
     const [uploadedExcelData, setUploadExcelData] = useState(null);
+    const [headerDetails, setHeaderDetails] = useState(null);
 
     useEffect(() => {
         function initHeaderTitleState() {
@@ -117,37 +99,19 @@ export default function UploadContainerMain(props) {
             return;
         }
 
-        let createHeaderData = {}
+        let data = []
         // 이미 등록된 헤더 양식이 있는 경우
         if(selectedHeaderTitleState?.uploadHeaderDetail.details.length > 0) {
-            createHeaderData = {
-                uploadedData: {
-                    details : [...selectedHeaderTitleState?.uploadHeaderDetail.details]
-                }
-            }
-        // }else if(props.uploadedExcelData) {     // 업로드된 엑셀 파일이 있는 경우
-        //     createHeaderData = {
-        //         uploadedData: {
-        //             details : [props.uploadedExcelData[0]]
-        //         }
-        //     }
+            data = [...selectedHeaderTitleState?.uploadHeaderDetail.details]
         }else {     // 새로운 양식을 만들 경우
-            createHeaderData = {
+            data = [{
                 id: uuidv4(),
-                uploadedData : {
-                    details : [{
-                        id: uuidv4(),
-                        headerName: '',
-                        cellType: 'String'
-                    }]
-                }
-            }
+                headerName: '',
+                cellType: 'String'
+            }]
         }
 
-        dispatchCreateUploadHeaderDetailState({
-            type: 'INIT_DATA',
-            payload: createHeaderData
-        })
+        setHeaderDetails(data);
         setCreateHeaderModalOpen(true);
     }
 
@@ -157,9 +121,8 @@ export default function UploadContainerMain(props) {
 
     const handleCreateUploadHeader = async (e) => {
         e.preventDefault();
-
-        let uploadedHeader = createUploadHeaderDetailState.uploadedData;
-        let uploadDetails = uploadedHeader.details.map((r, idx) => {
+        
+        let uploadDetails = headerDetails.map((r, idx) => {
             let data = new UploadHeaderDetail().toJSON();
             data = {
                 ...data,
@@ -191,7 +154,7 @@ export default function UploadContainerMain(props) {
     const onChangeDetailInputValue = (e, detailId) => {
         e.preventDefault();
 
-        let newDetails = createUploadHeaderDetailState?.uploadedData.details.map(r => {
+        let data = headerDetails.map(r => {
             if (r.id === detailId) {
                 return {
                     ...r,
@@ -204,36 +167,25 @@ export default function UploadContainerMain(props) {
             }
         });
 
-        dispatchCreateUploadHeaderDetailState({
-            type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
-            payload: newDetails
-        });
+        setHeaderDetails(data)
     }
 
-    const handleRemoveCell = (e, uploadHeaderId) => {
+    const handleRemoveCell = (e, headerId) => {
         e.preventDefault();
 
-        let newDetails = createUploadHeaderDetailState.uploadedData.details.filter(r => r.id !== uploadHeaderId);
-
-        dispatchCreateUploadHeaderDetailState({
-            type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
-            payload: newDetails
-        });
+        let data = headerDetails.filter(r => r.id !== headerId);
+        setHeaderDetails(data)
     }
 
     const handleAddCell = (e) => {
         e.preventDefault();
 
-        let newDetail = {
+        let data = [{
             id: uuidv4(),
             colData: '',
             cellType: 'String'
-        }
-
-        dispatchCreateUploadHeaderDetailState({
-            type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
-            payload: createUploadHeaderDetailState.uploadedData.details.concat(newDetail)
-        });
+        }]
+        setHeaderDetails([...headerDetails, ...data])
     }
 
     const handleMoveCellUp = (e, detailId) => {
@@ -241,7 +193,7 @@ export default function UploadContainerMain(props) {
 
         let targetIdx = -1;
 
-        createUploadHeaderDetailState.uploadedData.details.forEach((detail, idx) => {
+        headerDetails.forEach((detail, idx) => {
             if (detail.id === detailId) {
                 targetIdx = idx;
                 return;
@@ -256,7 +208,7 @@ export default function UploadContainerMain(props) {
 
         let targetIdx = -1;
 
-        createUploadHeaderDetailState.uploadedData.details.forEach((detail, idx) => {
+        headerDetails.forEach((detail, idx) => {
             if (detail.id === detailId) {
                 targetIdx = idx;
                 return;
@@ -267,19 +219,16 @@ export default function UploadContainerMain(props) {
     }
 
     const handleChangeArrayControl = (targetIdx, moveValue) => {
-        if (!(createUploadHeaderDetailState.uploadedData.details.length > 1)) return;
+        if (!(headerDetails.length > 1)) return;
 
         let newPosition = parseInt(moveValue);
-        if (newPosition < 0 || newPosition >= createUploadHeaderDetailState.uploadedData.details.length) return;
+        if (newPosition < 0 || newPosition >= headerDetails.length) return;
 
-        let headerDetailList = createUploadHeaderDetailState.uploadedData.details;
-        let target = headerDetailList.splice(targetIdx, 1)[0];
-        headerDetailList.splice(newPosition, 0, target);
+        let data = headerDetails;
+        let target = data.splice(targetIdx, 1)[0];
+        data.splice(newPosition, 0, target);
 
-        dispatchCreateUploadHeaderDetailState({
-            type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
-            payload: headerDetailList
-        })
+        setHeaderDetails([...data])
     }
 
     const handleDownloadForm = async (e) => {
@@ -315,14 +264,14 @@ export default function UploadContainerMain(props) {
                 fullWidth={true}
             >
                 <CreateUploadHeaderModal
-                    createUploadHeaderDetailState={createUploadHeaderDetailState}
+                    headerDetails={headerDetails}
 
-                    handleCreateUploadHeader={(e) => handleCreateUploadHeader(e)}
-                    onChangeDetailInputValue={(e, detailId) => onChangeDetailInputValue(e, detailId)}
-                    handleRemoveCell={(e, headerId) => handleRemoveCell(e, headerId)}
-                    handleAddCell={(e) => handleAddCell(e)}
-                    handleMoveCellUp={(e, detailId) => handleMoveCellUp(e, detailId)}
-                    handleMoveCellDown={(e, detailId) => handleMoveCellDown(e, detailId)}
+                    handleCreateUploadHeader={handleCreateUploadHeader}
+                    onChangeDetailInputValue={onChangeDetailInputValue}
+                    handleRemoveCell={handleRemoveCell}
+                    handleAddCell={handleAddCell}
+                    handleMoveCellUp={handleMoveCellUp}
+                    handleMoveCellDown={handleMoveCellDown}
                 ></CreateUploadHeaderModal>
             </ExcelTranslatorCommonModal>
         </>
