@@ -26,34 +26,6 @@ class DownloadHeaderDetail {
     }
 }
 
-const initialUpdateDownloadHeaderForm = null;
-
-const updateDownloadHeaderFormReducer = (state, action) => {
-    switch (action.type) {
-        case 'INIT_DATA':
-            return action.payload;
-        case 'SET_DOWNLOAD_HEADER_DETAIL_DATA':
-            return {
-                ...state,
-                downloadHeaderDetail: {
-                    ...state.downloadHeaderDetail,
-                    details: action.payload
-                }
-            }
-        case 'ADD_DATA':
-            return {
-                ...state,
-                downloadHeaderDetail: {
-                    ...state.downloadHeaderDetail,
-                    details: state.downloadHeaderDetail.details.concat(new DownloadHeaderDetail().toJSON())
-                }
-            }
-        case 'CLEAR':
-            return null;
-        default: return { ...state }
-    }
-}
-
 export default function DownloadContainerMain(props) {
     const location = useLocation();
     const query = queryString.parse(location.search)
@@ -61,8 +33,9 @@ export default function DownloadContainerMain(props) {
     const [createHeaderModalOpen, setCreateHeaderModalOpen] = useState(false);
     const [fixedValueCheckList, setFixedValueCheckList] = useState([]);
 
-    const [updateDownloadHeaderForm, dispatchUpdateDownloadHeaderForm] = useReducer(updateDownloadHeaderFormReducer, initialUpdateDownloadHeaderForm);
     const [selectedHeader, setSelectedHeader] = useState(null);
+
+    const [headerDetails, setHeaderDetails] = useState([]);
 
     useEffect(() => {
         function initHeaderTitleState() {
@@ -83,9 +56,7 @@ export default function DownloadContainerMain(props) {
         initHeaderTitleState();
     }, [query.headerId, props.excelTranslatorHeaderList]);
 
-    const onCreateHeaderModalOpen = (e) => {
-        e.preventDefault();
-
+    const onCreateHeaderModalOpen = () => {
         if (!selectedHeader) {
             alert('헤더 형식을 먼저 선택해주세요.');
             return;
@@ -94,29 +65,21 @@ export default function DownloadContainerMain(props) {
             return;
         }
 
-        dispatchUpdateDownloadHeaderForm({
-            type: 'INIT_DATA',
-            payload: { ...selectedHeader }
-        });
-
         setFixedValueCheckList(selectedHeader.downloadHeaderDetail.details.map(r => {
             if (r.targetCellNumber === -1) {
                 return r.id;
             }
         }));
 
-        if (!(selectedHeader.downloadHeaderDetail.details.length > 0)) {
-            dispatchUpdateDownloadHeaderForm({
-                type: 'INIT_DATA',
-                payload: {
-                    ...selectedHeader,
-                    downloadHeaderDetail: {
-                        details: [new DownloadHeaderDetail().toJSON()]
-                    }
-                }
-            });
+        let data = []
+        if (selectedHeader.downloadHeaderDetail.details.length > 0) {
+
+            data = [...selectedHeader?.downloadHeaderDetail.details]
+        }else {
+            data = [new DownloadHeaderDetail().toJSON()]
         }
 
+        setHeaderDetails(data);
         setCreateHeaderModalOpen(true);
     }
 
@@ -127,41 +90,34 @@ export default function DownloadContainerMain(props) {
     const handleAddCell = (e) => {
         e.preventDefault();
 
-        dispatchUpdateDownloadHeaderForm({
-            type: 'ADD_DATA'
-        });
+        let data = [new DownloadHeaderDetail().toJSON()]
+        setHeaderDetails([...headerDetails, ...data])
     }
 
-    const handleRemoveCell = (e, downloadHeaderId) => {
+    const handleRemoveCell = (e, headerId) => {
         e.preventDefault();
 
-        if(updateDownloadHeaderForm.downloadHeaderDetail.details.length > 1) {
-            let newDetails = updateDownloadHeaderForm.downloadHeaderDetail.details.filter(r=> r.id !== downloadHeaderId);
-            
-            dispatchUpdateDownloadHeaderForm({
-                type: 'SET_DOWNLOAD_HEADER_DETAIL_DATA',
-                payload: newDetails
-            });
+        if(headerDetails.length > 1) {
+            let data = headerDetails.filter(r=> r.id !== headerId);
+            setHeaderDetails(data)
         }else{
             alert('삭제할 수 없습니다.');
         }
     }
 
-    const handleCreateDownloadHeader = async (e) => {
+    const handleUpdateDownloadHeader = async (e) => {
         e.preventDefault();
 
-        await props.handleCreateDownloadForm(updateDownloadHeaderForm);
-        
-        setSelectedHeader([...updateDownloadHeaderForm])
+        await props.handleUpdateDownloadForm(headerDetails);
         onCreateHeaderModalClose();
     }
 
     const onChangeSelectedHeaderField = (e, downloadHeaderId) => {
         e.preventDefault();
 
-        let newDetails = updateDownloadHeaderForm.downloadHeaderDetail.details.map(r => {
+        let newDetails = headerDetails.map(r => {
             if(r.id === downloadHeaderId){
-                let uploadHeaderId = updateDownloadHeaderForm.uploadHeaderDetail.details.filter(uploadHeader => uploadHeader.cellNumber === e.target.value)[0].id;
+                let uploadHeaderId = selectedHeader?.uploadHeaderDetail.details.filter(r => r.cellNumber === e.target.value)[0].id;
 
                 return {
                     ...r,
@@ -175,10 +131,7 @@ export default function DownloadContainerMain(props) {
             }
         });
 
-        dispatchUpdateDownloadHeaderForm({
-            type: 'SET_DOWNLOAD_HEADER_DETAIL_DATA',
-            payload: newDetails
-        })
+        setHeaderDetails(newDetails)
     }
 
     const handleIsChecked = (downloadHeaderId) => {
@@ -186,11 +139,14 @@ export default function DownloadContainerMain(props) {
     }
 
     const handleCheckOne = (e, downloadHeaderId) => {
+        let checkList = []
+        let newDetails = []
+
         if (e.target.checked) {
-            setFixedValueCheckList(fixedValueCheckList.concat(downloadHeaderId));
+            checkList = fixedValueCheckList.concat(downloadHeaderId)
 
             // 체크하면 targetCellNumber을 -1으로 변경
-            let newDetails = updateDownloadHeaderForm.downloadHeaderDetail.details.map(r=>{
+            newDetails = headerDetails.map(r=>{
                 if(r.id === downloadHeaderId){
                     return {
                         ...r,
@@ -203,15 +159,12 @@ export default function DownloadContainerMain(props) {
                 }
             });
 
-            dispatchUpdateDownloadHeaderForm({
-                type: 'SET_DOWNLOAD_HEADER_DETAIL_DATA',
-                payload: newDetails
-            })
+            setHeaderDetails(newDetails)
         } else {
-            setFixedValueCheckList(fixedValueCheckList.filter(r => r !== downloadHeaderId));
+            checkList = fixedValueCheckList.filter(r => r !== downloadHeaderId);
 
             // 체크 해제하면 fixedValue를 빈 값으로 변경
-            let newDetails = updateDownloadHeaderForm.downloadHeaderDetail.details.map(r=>{
+            newDetails = headerDetails.map(r => {
                 if(r.id === downloadHeaderId){
                     return {
                         ...r,
@@ -225,17 +178,16 @@ export default function DownloadContainerMain(props) {
                 }
             });
 
-            dispatchUpdateDownloadHeaderForm({
-                type: 'SET_DOWNLOAD_HEADER_DETAIL_DATA',
-                payload: newDetails
-            })
         }
+        
+        setFixedValueCheckList(checkList)
+        setHeaderDetails(newDetails)
     }
 
     const onChangeHeaderFieldValue = (e, downloadHeaderId) => {
         e.preventDefault();
 
-        let newDetails = updateDownloadHeaderForm?.downloadHeaderDetail.details.map(r => {
+        let newDetails = headerDetails?.map(r => {
             if(r.id === downloadHeaderId){
                 return {
                     ...r,
@@ -248,10 +200,7 @@ export default function DownloadContainerMain(props) {
             }
         });
 
-        dispatchUpdateDownloadHeaderForm({
-            type: 'SET_DOWNLOAD_HEADER_DETAIL_DATA',
-            payload: newDetails
-        })
+        setHeaderDetails(newDetails)
     }
 
     return (
@@ -259,7 +208,6 @@ export default function DownloadContainerMain(props) {
             <DownloadContainerBody
                 createHeaderModalOpen={createHeaderModalOpen}
                 selectedHeader={selectedHeader}
-                updateDownloadHeaderForm={updateDownloadHeaderForm}
 
                 onCreateHeaderModalOpen={onCreateHeaderModalOpen}
             />
@@ -272,11 +220,12 @@ export default function DownloadContainerMain(props) {
                 fullWidth={true}
             >
                 <CreateDownloadHeaderModal
-                    updateDownloadHeaderForm={updateDownloadHeaderForm}
+                    selectedHeader={selectedHeader}
+                    headerDetails={headerDetails}
 
+                    handleUpdateDownloadHeader={handleUpdateDownloadHeader}
                     handleAddCell={handleAddCell}
                     handleRemoveCell={handleRemoveCell}
-                    handleCreateDownloadHeader={handleCreateDownloadHeader}
                     onChangeSelectedHeaderField={onChangeSelectedHeaderField}
                     handleIsChecked={handleIsChecked}
                     handleCheckOne={handleCheckOne}

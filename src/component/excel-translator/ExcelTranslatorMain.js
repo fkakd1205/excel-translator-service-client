@@ -95,8 +95,8 @@ export default function ExcelTranslatorMain(props) {
                         alert(res?.data?.message);
                     })
             },
-            createDownloadHeaderDetails: async function (downloadHeaderDetails) {
-                await excelTranslatorDataConnect().createDownloadHeaderDetails(downloadHeaderDetails)
+            updateDownloadHeaderDetails: async function (downloadHeaderDetails) {
+                await excelTranslatorDataConnect().updateDownloadHeaderDetails(selectedTranslator.id, downloadHeaderDetails)
                     .then(res => {
                         if (res.status === 200) {
                             alert('저장되었습니다.');
@@ -184,7 +184,7 @@ export default function ExcelTranslatorMain(props) {
         await __handleDataConnect().downloadTranslatedExcelFile(translatedDetail);
     }
 
-    const handleCreateUploadForm = async (uploadHeaderDetails) => {
+    const handleUpdateUploadForm = async (uploadHeaderDetails) => {
         setBackdropLoading(true);
         await __handleDataConnect().updateUploadHeaderDetails(uploadHeaderDetails);
         await __handleDataConnect().searchExcelTranslatorHeader();
@@ -198,9 +198,9 @@ export default function ExcelTranslatorMain(props) {
         setBackdropLoading(false);
     }
 
-    const handleCreateDownloadForm = async (downloadHeaderDetails) => {
+    const handleUpdateDownloadForm = async (downloadHeaderDetails) => {
         setBackdropLoading(true);
-        await __handleDataConnect().createDownloadHeaderDetails(downloadHeaderDetails);
+        await __handleDataConnect().updateDownloadHeaderDetails(downloadHeaderDetails);
         await __handleDataConnect().searchExcelTranslatorHeader();
         setBackdropLoading(false)
     }
@@ -224,7 +224,7 @@ export default function ExcelTranslatorMain(props) {
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
                     uploadedExcelData={uploadedExcelData}
 
-                    handleCreateUploadForm={handleCreateUploadForm}
+                    handleUpdateUploadForm={handleUpdateUploadForm}
                     handleDownloadForUploadForm={handleDownloadForUploadForm}
                 />
 
@@ -232,7 +232,7 @@ export default function ExcelTranslatorMain(props) {
                 <DownloadContainerMain
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
 
-                    handleCreateDownloadForm={handleCreateDownloadForm}
+                    handleUpdateDownloadForm={handleUpdateDownloadForm}
                 />
             </Container>
 

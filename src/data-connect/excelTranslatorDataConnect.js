@@ -38,8 +38,8 @@ const excelTranslatorDataConnect = () => {
                 withCredentials: true
             })
         },
-        createDownloadHeaderDetails: async function (downloadHeaderDetail) {
-            return await axios.put(`/api/v1/excel-translator/header/download/one`, downloadHeaderDetail, {
+        updateDownloadHeaderDetails: async function (headerId, downloadHeaderDetail) {
+            return await axios.put(`/api/v1/excel-translator/header/download/one/${headerId}`, downloadHeaderDetail, {
                 withCredentials: true
             })
         },

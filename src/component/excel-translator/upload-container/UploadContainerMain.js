@@ -52,7 +52,7 @@ export default function UploadContainerMain(props) {
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
     
     const [uploadedExcelData, setUploadExcelData] = useState(null);
-    const [headerDetails, setHeaderDetails] = useState(null);
+    const [headerDetails, setHeaderDetails] = useState([]);
 
     useEffect(() => {
         function initHeaderTitleState() {
@@ -104,11 +104,7 @@ export default function UploadContainerMain(props) {
         if(selectedHeaderTitleState?.uploadHeaderDetail.details.length > 0) {
             data = [...selectedHeaderTitleState?.uploadHeaderDetail.details]
         }else {     // 새로운 양식을 만들 경우
-            data = [{
-                id: uuidv4(),
-                headerName: '',
-                cellType: 'String'
-            }]
+            data = [new UploadHeaderDetail().toJSON()]
         }
 
         setHeaderDetails(data);
@@ -139,7 +135,7 @@ export default function UploadContainerMain(props) {
             payload: uploadDetails
         });
         
-        await props.handleCreateUploadForm(uploadDetails);
+        await props.handleUpdateUploadForm(uploadDetails);
         onCreateHeaderModalClose();
     }
 
@@ -172,11 +168,7 @@ export default function UploadContainerMain(props) {
     const handleAddCell = (e) => {
         e.preventDefault();
 
-        let data = [{
-            id: uuidv4(),
-            colData: '',
-            cellType: 'String'
-        }]
+        let data = [new UploadHeaderDetail().toJSON()]
         setHeaderDetails([...headerDetails, ...data])
     }
 
