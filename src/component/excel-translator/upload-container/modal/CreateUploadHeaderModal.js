@@ -8,7 +8,7 @@ export default function CreateUploadHeaderModal(props) {
     return (
         <>
             <Container>
-                <form onSubmit={(e) => props.handleCreateUploadHeader(e)}>
+                <form onSubmit={(e) => props.handleUpdateUploadHeader(e)}>
                     <div className='modal-header'>
                         <GroupTitle>업로드 엑셀 양식</GroupTitle>
                         <CreateBtn type='submit'><AddTaskIcon /></CreateBtn>
@@ -42,9 +42,11 @@ export default function CreateUploadHeaderModal(props) {
                             })}
                         </CreateContainer>
                         <CustomDataGroup>
-                            <AddCircleOutlineIcon type="button" sx={{ fontSize: 30 }}
-                                onClick={(e) => props.handleAddCell(e)}
-                            />
+                            <div className='add-button'>
+                                <AddCircleOutlineIcon type="button" sx={{ fontSize: 30 }}
+                                    onClick={(e) => props.handleAddCell(e)}
+                                />
+                            </div>
                         </CustomDataGroup>
                     </BodyContainer>
                 </form>

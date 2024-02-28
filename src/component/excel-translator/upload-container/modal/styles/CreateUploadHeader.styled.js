@@ -40,7 +40,7 @@ export const DataText = styled.div`
 
 export const BodyContainer = styled.div`
     padding: 5px;
-    max-height: 400px;
+    max-height: 500px;
     overflow: auto;
     background-color: #c1c7d7;
     overflow-x: hidden;
@@ -99,18 +99,14 @@ export const DataInputEl = styled.input`
 
 export const CustomDataGroup = styled.div`
     text-align: center;
-    width: 100%;
     padding: 10px;
 
-    &:hover{
-        transform: scale(1.1);
-    }
+    .add-button {
 
-    &:active{
-        transition: 0s;
-        transform: scale(1.05);
-
-        color: #8e90e3;
+        &:hover{
+            transform: scale(1.1);
+            cursor: pointer;
+        }
     }
 `;
 

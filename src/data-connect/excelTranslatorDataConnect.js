@@ -33,8 +33,8 @@ const excelTranslatorDataConnect = () => {
                 withCredentials: true
             })
         },
-        createUploadHeaderDetail: async function (uploadHeaderDetail) {
-            return await axios.put(`/api/v1/excel-translator/header/upload/one`, uploadHeaderDetail, {
+        updateUploadHeaderDetail: async function (headerId, uploadedDetails) {
+            return await axios.put(`/api/v1/excel-translator/header/upload/one/${headerId}`, uploadedDetails, {
                 withCredentials: true
             })
         },
@@ -49,8 +49,8 @@ const excelTranslatorDataConnect = () => {
                 withCredentials: true
             })
         },
-        downloadUploadedHeaderDetails: async function (uploadedDetails) {
-            return await axios.post(`api/v1/excel-translator/header/upload/download`, uploadedDetails, {
+        downloadUploadedHeaderDetails: async function (headerId) {
+            return await axios.get(`api/v1/excel-translator/header/upload/download/${headerId}`, {
                 responseType: 'blob',
                 withCredentials: true
             })

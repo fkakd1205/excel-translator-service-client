@@ -46,7 +46,7 @@ const selectedHeaderTitleStateReducer = (state, action) => {
 
 export default function UploadContainerMain(props) {
     const location = useLocation()
-    let query = queryString.parse(location.search);
+    const query = queryString.parse(location.search);
 
     const [createHeaderModalOpen, setCreateHeaderModalOpen] = useState(false);
     const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
@@ -119,7 +119,7 @@ export default function UploadContainerMain(props) {
         setCreateHeaderModalOpen(false);
     }
 
-    const handleCreateUploadHeader = async (e) => {
+    const handleUpdateUploadHeader = async (e) => {
         e.preventDefault();
         
         let uploadDetails = headerDetails.map((r, idx) => {
@@ -134,20 +134,12 @@ export default function UploadContainerMain(props) {
             return data;
         });
 
-        let excelHeader = {
-            ...selectedHeaderTitleState,
-            uploadHeaderDetail: {
-                ...selectedHeaderTitleState.uploadHeaderDetail,
-                details: uploadDetails
-            }
-        };
-
         dispatchSelectedHeaderTitleState({
             type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
             payload: uploadDetails
         });
-
-        await props.handleCreateUploadForm(excelHeader);
+        
+        await props.handleCreateUploadForm(uploadDetails);
         onCreateHeaderModalClose();
     }
 
@@ -231,18 +223,8 @@ export default function UploadContainerMain(props) {
         setHeaderDetails([...data])
     }
 
-    const handleDownloadForm = async (e) => {
-        e.preventDefault();
-
-        // TODO :: colData로 변환하지 않고 다운로드 할 수 있는 방법 생각해보기
-        let downloadDetail = selectedHeaderTitleState.uploadHeaderDetail.details.map(r => {
-            return {
-                ...r,
-                colData: r.headerName
-            }
-        });
-
-        await props.handleDownloadForUploadForm(selectedHeaderTitleState, downloadDetail);
+    const handleDownloadForm = async () => {
+        await props.handleDownloadForUploadForm();
     }
 
     return (
@@ -266,7 +248,7 @@ export default function UploadContainerMain(props) {
                 <CreateUploadHeaderModal
                     headerDetails={headerDetails}
 
-                    handleCreateUploadHeader={handleCreateUploadHeader}
+                    handleUpdateUploadHeader={handleUpdateUploadHeader}
                     onChangeDetailInputValue={onChangeDetailInputValue}
                     handleRemoveCell={handleRemoveCell}
                     handleAddCell={handleAddCell}

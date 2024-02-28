@@ -7,6 +7,8 @@ import ControlBarMain from './control-bar/ControlBarMain';
 import UploadContainerMain from './upload-container/UploadContainerMain';
 import DownloadContainerMain from './download-container/DownloadContainerMain';
 import { dateToYYMMDD } from '../../handler/dateHandler';
+import { useLocation } from 'react-router-dom';
+import queryString from 'query-string';
 
 class TranslatedData {
     constructor() {
@@ -25,9 +27,13 @@ class TranslatedData {
 }
 
 export default function ExcelTranslatorMain(props) {
+    const location = useLocation();
+    const query = queryString.parse(location.search);
+
     const [excelTranslatorHeaderList, setExcelTranslatorHeaderList] = useState(null);
     const [uploadedExcelData, setUploadedExcelData] = useState(null);
     const [backdropLoading, setBackdropLoading] = useState(false);
+    const [selectedTranslator, setSelectedTranslator] = useState(null);
 
     useEffect(() => {
         async function fetchInit() {
@@ -36,6 +42,19 @@ export default function ExcelTranslatorMain(props) {
 
         fetchInit();
     }, [])
+
+    useEffect(() => {
+        if(!excelTranslatorHeaderList) {
+            return;
+        }
+
+        if(!(query && query.headerId)) {
+            return;
+        }
+
+        let translator = excelTranslatorHeaderList.find(r => r.id === query.headerId);
+        setSelectedTranslator(translator)
+    }, [excelTranslatorHeaderList, query])
 
     const __handleDataConnect = () => {
         return {
@@ -63,8 +82,8 @@ export default function ExcelTranslatorMain(props) {
                         alert(res?.data?.message);
                     })
             },
-            createUploadHeaderDetails: async function (uploadHeaderDetails) {
-                await excelTranslatorDataConnect().createUploadHeaderDetail(uploadHeaderDetails)
+            updateUploadHeaderDetails: async function (uploadHeaderDetails) {
+                await excelTranslatorDataConnect().updateUploadHeaderDetail(selectedTranslator.id, uploadHeaderDetails)
                     .then(res => {
                         if (res.status === 200) {
                             alert('완료되었습니다.');
@@ -103,11 +122,11 @@ export default function ExcelTranslatorMain(props) {
                         console.log(err);
                     });
             },
-            downloadUploadedHeaderDetails: async function (titleData, uploadedDetails) {
+            downloadUploadedHeaderDetails: async function () {
                 let date = new Date()
-                let fileName = `[${dateToYYMMDD(date)}]${titleData.uploadHeaderTitle}_${titleData.downloadHeaderTitle}`
+                let fileName = `[${dateToYYMMDD(date)}]${selectedTranslator.uploadHeaderTitle}_${selectedTranslator.downloadHeaderTitle}`
 
-                await excelTranslatorDataConnect().downloadUploadedHeaderDetails(uploadedDetails)
+                await excelTranslatorDataConnect().downloadUploadedHeaderDetails(selectedTranslator.id)
                     .then(res => {
                         const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
                         const link = document.createElement('a');
@@ -167,14 +186,14 @@ export default function ExcelTranslatorMain(props) {
 
     const handleCreateUploadForm = async (uploadHeaderDetails) => {
         setBackdropLoading(true);
-        await __handleDataConnect().createUploadHeaderDetails(uploadHeaderDetails);
+        await __handleDataConnect().updateUploadHeaderDetails(uploadHeaderDetails);
         await __handleDataConnect().searchExcelTranslatorHeader();
         setBackdropLoading(false);
     }
 
-    const handleDownloadForUploadForm = async (titleData, uploadHeaderDetails) => {
+    const handleDownloadForUploadForm = async () => {
         setBackdropLoading(true);
-        await __handleDataConnect().downloadUploadedHeaderDetails(titleData,uploadHeaderDetails);
+        await __handleDataConnect().downloadUploadedHeaderDetails();
         await __handleDataConnect().searchExcelTranslatorHeader();
         setBackdropLoading(false);
     }
