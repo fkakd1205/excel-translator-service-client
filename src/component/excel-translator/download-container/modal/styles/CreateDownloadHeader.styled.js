@@ -56,7 +56,7 @@ export const DataWrapper = styled.div`
     position: relative;
     margin-bottom: 10px;
     border-radius: 10px;
-    padding: 10px 16px 30px 16px;
+    padding: 10px 16px 10px 16px;
     height: auto;
     background-color: #e8ecf7;
 
@@ -68,9 +68,11 @@ export const DataWrapper = styled.div`
 `;
 
 export const DataInputEl = styled.input`
-    border: none;
+    width: 100%;
     padding: 10px;
+    border: 1px solid white;
     border-bottom: 1px solid #ced4da;
+
     &:focus{
         outline: none;
         border: 1px solid #4662B4;
@@ -96,37 +98,34 @@ export const CustomDataGroup = styled.div`
 `;
 
 export const UploadDataGroup = styled.div`
-    display: grid;
-    grid-template-columns: 1fr 7fr;
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-
-    & .add-cell-btn {
-        grid-column: span 3;
-    }
+    width: 100%;
+    gap: 10px;
 `;
 
 export const DownloadDataGroup = styled.div`
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    column-gap: 10px;
-    text-align: left;
+    display: flex;
+    gap: 10px;
     align-items: center;
-    margin: 10px 0px;
 
-    @media only screen and (max-width:992px){
-        grid-template-columns: 1fr;
-        place-content: center;
+    .label-el {
+        width: 100px;
     }
 
-    @media only screen and (max-width:576px){
-        grid-template-columns: 100%;
+    .input-el {
+        width: 70%;
     }
 `;
 
 export const DownloadInfo = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     background-color: white;
     padding: 20px;
+    width: 100%;
     border-radius: 10px;
 `;
 
@@ -153,17 +152,17 @@ export const DeleteBtn = styled.div`
         background-color: var(--default-red-color);
         border: 1px solid var(--default-red-color);
         border-radius: 50%;
-        width: 35px;
-        height: 35px;
+        width: 30px;
+        height: 30px;
     }
 `;
 
 export const DataGroup = styled.div`
-    display: grid;
-    grid-template-columns: 40% 7% 50%;
-    padding: 5px;
-    text-align: center;
+    display: flex;
+    gap: 10px;
     align-items: center;
+    justify-content: space-between;
+    padding: 5px;
 
     .icon-must {
         position: relative;
@@ -175,18 +174,6 @@ export const DataGroup = styled.div`
         border-radius: 50%;
         vertical-align: middle;
     }
-
-    @media only screen and (max-width:992px){
-        display: grid;
-        grid-template-columns: 1fr;
-        row-gap: 10px;
-        place-content: center;
-        /* padding: 0 10%; */
-    }
-
-    @media only screen and (max-width:576px){
-        grid-template-columns: 100%;
-    }
 `;
 
 export const ArrowSpan = styled.div`
@@ -196,10 +183,8 @@ export const ArrowSpan = styled.div`
 `;
 
 export const FormInput = styled.div`
-    color: black;
-    display: flex;
     background-color: white;
-    vertical-align: middle;
+    width: 100%;
 `;
 
 export const CreateBtn = styled.button`

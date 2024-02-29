@@ -107,14 +107,17 @@ export default function ExcelTranslatorMain(props) {
                         alert(res?.data?.message);
                     })
             },
-            downloadTranslatedExcelFile: async function (translatedDetails) {
-                await excelTranslatorDataConnect().downloadTranslatedExcelFile(translatedDetails)
+            downloadTranslatedExcelFile: async function (uploadedData) {
+                let date = new Date()
+                let fileName = `[${dateToYYMMDD(date)}]${selectedTranslator.uploadHeaderTitle}_${selectedTranslator.downloadHeaderTitle}`
+
+                await excelTranslatorDataConnect().downloadTranslatedExcelFile(selectedTranslator.id, uploadedData)
                     .then(res => {
                         const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
                         const link = document.createElement('a');
                         link.href = url;
 
-                        link.setAttribute('download', '엑셀변환기 다운로드.xlsx');
+                        link.setAttribute('download', `${fileName}.xlsx`);
                         document.body.appendChild(link);
                         link.click();
                     })
@@ -124,7 +127,7 @@ export default function ExcelTranslatorMain(props) {
             },
             downloadUploadedHeaderDetails: async function () {
                 let date = new Date()
-                let fileName = `[${dateToYYMMDD(date)}]${selectedTranslator.uploadHeaderTitle}_${selectedTranslator.downloadHeaderTitle}`
+                let fileName = `[${dateToYYMMDD(date)}]${selectedTranslator.uploadHeaderTitle}_양식_샘플`
 
                 await excelTranslatorDataConnect().downloadUploadedHeaderDetails(selectedTranslator.id)
                     .then(res => {
@@ -149,39 +152,10 @@ export default function ExcelTranslatorMain(props) {
         setBackdropLoading(false);   
     }
 
-    const handleDownloadTranslatedExcelFile = async (downloadHeaderDetail) => {
-        let excelData = downloadHeaderDetail.map(r => {
-            return uploadedExcelData.map((data, idx) => {
-                if (idx === 0) {
-                    // 다운로드 헤더 이름 설정
-                    let details = {
-                        colData: r.headerName,
-                        cellType: 'String'
-                    }
-                    return details;
-                } else {
-                    // 고정값 컬럼이라면
-                    if (r.targetCellNumber === -1) {
-                        let details = {
-                            colData: r.fixedValue,
-                            cellType: 'String'
-                        };
-                        return details;
-                    } else {
-                        return data.uploadedData.details[r.targetCellNumber];
-                    }
-                }
-            });
-        });
-
-        // dto로 변경
-        let translatedDetail = excelData.map(r => {
-            let data = new TranslatedData().toJSON();
-            data.translatedData.details = r;
-            return data;
-        })
-
-        await __handleDataConnect().downloadTranslatedExcelFile(translatedDetail);
+    const handleDownloadTranslatedExcelFile = async () => {
+        // TODO :: uploadedExcelData에 헤더 데이터 제거하기
+        let uploadedData = uploadedExcelData.slice(1);
+        await __handleDataConnect().downloadTranslatedExcelFile(uploadedData);
     }
 
     const handleUpdateUploadForm = async (uploadHeaderDetails) => {

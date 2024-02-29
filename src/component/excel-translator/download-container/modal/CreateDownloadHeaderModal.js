@@ -36,7 +36,7 @@ export default function CreateDownloadHeaderModal(props) {
                                         <DataWrapper>
                                             <DeleteBtn>
                                                 <button type='button' className='button-el' onClick={(e) => props.handleRemoveCell(e, downloadHeader.id)}>
-                                                    <img src="./assets/icons/delete_ffffff.svg" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}/>
+                                                    <img src="./assets/icons/delete_ffffff.svg" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '20px' }}/>
                                                 </button>
                                             </DeleteBtn>
                                             <DataGroup>
@@ -72,21 +72,22 @@ export default function CreateDownloadHeaderModal(props) {
                                                 <ArrowSpan className="arrow-img"><ArrowForwardIosIcon /></ArrowSpan>
                                                 <DownloadInfo>
                                                     <DownloadDataGroup>
-                                                        <div>설정 헤더명<i className="icon-must" aria-label="필수항목"></i></div>
-                                                        <DataInputEl type="text" name='headerName' placeholder='다운로드 엑셀 항목명' onChange={(e) => props.onChangeHeaderFieldValue(e, downloadHeader.id)} value={downloadHeader.headerName} required></DataInputEl>
+                                                        <div className='label-el'>설정 헤더명<i className="icon-must" aria-label="필수항목"></i></div>
+                                                        <div className='input-el'>
+                                                            <DataInputEl type="text" name='headerName' placeholder='다운로드 엑셀 항목명' onChange={(e) => props.onChangeDetailInputValue(e, downloadHeader.id)} value={downloadHeader.headerName} required></DataInputEl>
+                                                        </div>
                                                     </DownloadDataGroup>
                                                     <DownloadDataGroup>
-                                                        <div>고정값 여부</div>
-                                                        <div>
+                                                        <div className='label-el'>
+                                                            <span>고정값</span>
                                                             <Checkbox
                                                                 onClick={(e) => props.handleCheckOne(e, downloadHeader.id)}
                                                                 checked={isChecked}
                                                             />
                                                         </div>
-                                                    </DownloadDataGroup>
-                                                    <DownloadDataGroup>
-                                                        <div>고정값</div>
-                                                        <DataInputEl type="text" name='fixedValue' placeholder='엑셀 고정 값' onChange={(e) => props.onChangeHeaderFieldValue(e, downloadHeader.id)} disabled={!props.handleIsChecked(downloadHeader.id)} value={downloadHeader.fixedValue}></DataInputEl>
+                                                        <div className='input-el'>
+                                                            <DataInputEl type="text" name='fixedValue' placeholder='엑셀 고정 값' onChange={(e) => props.onChangeDetailInputValue(e, downloadHeader.id)} disabled={!props.handleIsChecked(downloadHeader.id)} value={downloadHeader.fixedValue}></DataInputEl>
+                                                        </div>
                                                     </DownloadDataGroup>
                                                 </DownloadInfo>
                                             </DataGroup>

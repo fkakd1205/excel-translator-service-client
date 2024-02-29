@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Container = styled.div`
     .icon-must {
         position: relative;
-        margin-left: 5px;
+        margin-right: 5px;
         width: 6px;
         height: 6px;
         display: inline-block;
@@ -42,7 +42,7 @@ export const GroupTitle = styled.div`
 export const DataTitle = styled.div`
     font-size: 1rem;
     font-weight: 500;
-    padding:15px;
+    padding: 15px 5px;
     @media only screen and (max-width:425px){
         padding: 15px 0;
     }

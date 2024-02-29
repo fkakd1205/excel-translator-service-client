@@ -52,8 +52,8 @@ export default function ControlBarBody(props) {
                         <ControlLabel htmlFor="upload-file-input">Upload</ControlLabel>
                         <Input id="upload-file-input" type="file" accept=".xls,.xlsx" onClick={(e) => e.target.value = ''} onChange={(e) => props.handleUploadExcelFile(e)} />
                     </div>
-                    <div className='button-box' onSubmit={(e) => props.handleDownloadTranslatedFile(e)}>
-                        <ControlBtn type="submit">Download</ControlBtn>
+                    <div className='button-box' onClick={(e) => props.handleDownloadTranslatedFile(e)}>
+                        <ControlBtn type="button">Download</ControlBtn>
                     </div>
                 </FromGroup>
             </Container>

@@ -274,7 +274,7 @@ export default function ControlBarMain(props) {
             return;
         }
 
-        await props.handleDownloadTranslatedExcelFile(selectedHeader.downloadHeaderDetail.details);
+        await props.handleDownloadTranslatedExcelFile();
     }
 
     const __dataConnectControl = () => {

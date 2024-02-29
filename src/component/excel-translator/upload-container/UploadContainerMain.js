@@ -24,45 +24,21 @@ class UploadHeaderDetail {
     }
 }
 
-const initialSelectedHeaderTitleState = null;
-
-const selectedHeaderTitleStateReducer = (state, action) => {
-    switch (action.type) {
-        case 'INIT_DATA':
-            return action.payload;
-        case 'SET_UPLOAD_HEADER_DETAIL_DATA':
-            return {
-                ...state,
-                uploadHeaderDetail: {
-                    ...state.uploadHeaderDetail,
-                    details: action.payload
-                }
-            }
-        case 'CLEAR':
-            return null;
-        default: return { ...state }
-    }
-}
-
 export default function UploadContainerMain(props) {
     const location = useLocation()
     const query = queryString.parse(location.search);
 
     const [createHeaderModalOpen, setCreateHeaderModalOpen] = useState(false);
-    const [selectedHeaderTitleState, dispatchSelectedHeaderTitleState] = useReducer(selectedHeaderTitleStateReducer, initialSelectedHeaderTitleState);
     
+    const [selectedHeader, setSelectedHeader] = useState(null);
     const [uploadedExcelData, setUploadExcelData] = useState(null);
     const [headerDetails, setHeaderDetails] = useState([]);
 
     useEffect(() => {
         function initHeaderTitleState() {
             let headerId = query.headerId;
-            let headerTitleState = props.excelTranslatorHeaderList.find(r => r.id === headerId);
-
-            dispatchSelectedHeaderTitleState({
-                type: 'INIT_DATA',
-                payload: headerTitleState
-            });
+            let headers = props.excelTranslatorHeaderList.find(r => r.id === headerId);
+            setSelectedHeader(headers)
         }
         
         if (!props.excelTranslatorHeaderList) {
@@ -70,9 +46,7 @@ export default function UploadContainerMain(props) {
         }
 
         if(!query.headerId) {
-            dispatchSelectedHeaderTitleState({
-                type: 'CLEAR'
-            });
+            setSelectedHeader(null);
             return;
         }
 
@@ -80,7 +54,7 @@ export default function UploadContainerMain(props) {
     }, [query.headerId, props.excelTranslatorHeaderList]);
 
     useEffect(() => {
-        if(!selectedHeaderTitleState) {
+        if(!selectedHeader) {
             return;
         }
         
@@ -91,18 +65,18 @@ export default function UploadContainerMain(props) {
         // 헤더 데이터를 제외한 데이터 설정
         let data = props.uploadedExcelData?.filter((r, idx) => idx !== 0)
         setUploadExcelData([...data])
-    }, [selectedHeaderTitleState, props.uploadedExcelData]);
+    }, [selectedHeader, props.uploadedExcelData]);
 
     const onCreateHeaderModalOpen = () => {
-        if (!selectedHeaderTitleState) {
+        if (!selectedHeader) {
             alert('헤더 형식을 먼저 선택해주세요.');
             return;
         }
 
         let data = []
         // 이미 등록된 헤더 양식이 있는 경우
-        if(selectedHeaderTitleState?.uploadHeaderDetail.details.length > 0) {
-            data = [...selectedHeaderTitleState?.uploadHeaderDetail.details]
+        if(selectedHeader.uploadHeaderDetail.details.length > 0) {
+            data = [...selectedHeader.uploadHeaderDetail.details]
         }else {     // 새로운 양식을 만들 경우
             data = [new UploadHeaderDetail().toJSON()]
         }
@@ -117,24 +91,18 @@ export default function UploadContainerMain(props) {
 
     const handleUpdateUploadHeader = async (e) => {
         e.preventDefault();
-        
+             
+        // 헤더 순서 설정
         let uploadDetails = headerDetails.map((r, idx) => {
-            let data = new UploadHeaderDetail().toJSON();
-            data = {
-                ...data,
+            let data = {
+                ...r,
                 cellNumber: idx,
-                headerName: r.headerName || r.colData,
+                headerName: r.headerName,
                 cellType: r.cellType
             };
 
             return data;
         });
-
-        dispatchSelectedHeaderTitleState({
-            type: 'SET_UPLOAD_HEADER_DETAIL_DATA',
-            payload: uploadDetails
-        });
-        
         await props.handleUpdateUploadForm(uploadDetails);
         onCreateHeaderModalClose();
     }
@@ -223,7 +191,7 @@ export default function UploadContainerMain(props) {
         <>
             <UploadContainerBody
                 uploadedExcelData={uploadedExcelData}
-                selectedHeaderTitleState={selectedHeaderTitleState}
+                selectedHeader={selectedHeader}
 
                 onCreateHeaderModalOpen={onCreateHeaderModalOpen}
                 onCreateHeaderModalClose={onCreateHeaderModalClose}

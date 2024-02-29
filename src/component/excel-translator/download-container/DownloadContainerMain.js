@@ -1,4 +1,4 @@
-import { useState, useReducer, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import queryString from 'query-string';
 import CreateDownloadHeaderModal from "./modal/CreateDownloadHeaderModal";
@@ -21,7 +21,7 @@ class DownloadHeaderDetail {
             headerName: this.headerName,
             targetCellNumber: this.targetCellNumber,
             fixedValue: this.fixedValue,
-            uploadHeaderId: this.uploadheaderId
+            uploadHeaderId: this.uploadHeaderId
         }
     }
 }
@@ -34,7 +34,6 @@ export default function DownloadContainerMain(props) {
     const [fixedValueCheckList, setFixedValueCheckList] = useState([]);
 
     const [selectedHeader, setSelectedHeader] = useState(null);
-
     const [headerDetails, setHeaderDetails] = useState([]);
 
     useEffect(() => {
@@ -184,10 +183,10 @@ export default function DownloadContainerMain(props) {
         setHeaderDetails(newDetails)
     }
 
-    const onChangeHeaderFieldValue = (e, downloadHeaderId) => {
+    const onChangeDetailInputValue = (e, downloadHeaderId) => {
         e.preventDefault();
 
-        let newDetails = headerDetails?.map(r => {
+        let data = headerDetails?.map(r => {
             if(r.id === downloadHeaderId){
                 return {
                     ...r,
@@ -200,7 +199,7 @@ export default function DownloadContainerMain(props) {
             }
         });
 
-        setHeaderDetails(newDetails)
+        setHeaderDetails(data)
     }
 
     return (
@@ -229,7 +228,7 @@ export default function DownloadContainerMain(props) {
                     onChangeSelectedHeaderField={onChangeSelectedHeaderField}
                     handleIsChecked={handleIsChecked}
                     handleCheckOne={handleCheckOne}
-                    onChangeHeaderFieldValue={onChangeHeaderFieldValue}
+                    onChangeDetailInputValue={onChangeDetailInputValue}
                 ></CreateDownloadHeaderModal>
             </ExcelTranslatorCommonModal>
         </>

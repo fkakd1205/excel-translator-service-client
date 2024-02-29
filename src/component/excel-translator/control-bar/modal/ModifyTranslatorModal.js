@@ -16,7 +16,10 @@ export default function ModifyTranslatorModal(props) {
                     </ItemContainer>
                     <BodyContainer>
                         <HeaderInfo className="input-group mb-3">
-                            <DataTitle><i className="icon-must" aria-label="필수항목"></i> 업로드 엑셀 이름</DataTitle>
+                            <DataTitle>
+                                <i className="icon-must" aria-label="필수항목"></i>
+                                <span>업로드 엑셀 이름</span>
+                            </DataTitle>
                             <CommonInputEl type="text" name='uploadHeaderTitle'
                                 value={props.excelTitleInfo?.uploadHeaderTitle || ''}
                                 onChange={(e) => props.onChangeInputValue(e)}
@@ -24,7 +27,10 @@ export default function ModifyTranslatorModal(props) {
                             />
                         </HeaderInfo>
                         <HeaderInfo className="input-group mb-3">
-                            <DataTitle><i className="icon-must" aria-label="필수항목"></i> 다운로드 엑셀 이름</DataTitle>
+                            <DataTitle>
+                                <i className="icon-must" aria-label="필수항목"></i>
+                                <span>다운로드 엑셀 이름</span>
+                            </DataTitle>
                             <CommonInputEl type="text" name='downloadHeaderTitle'
                                 value={props.excelTitleInfo?.downloadHeaderTitle || ''}
                                 onChange={(e) => props.onChangeInputValue(e)}
@@ -32,7 +38,11 @@ export default function ModifyTranslatorModal(props) {
                             />
                         </HeaderInfo>
                         <HeaderInfo className="input-group mb-3">
-                            <DataTitle><i className="icon-must" aria-label="필수항목"></i> 데이터 시작 행</DataTitle>
+                            <DataTitle>
+                                <i className="icon-must" aria-label="필수항목"></i>
+                                <span>데이터 시작 행</span>
+                                <span style={{ color: '#5d5d5d', fontSize: '14px', padding: '0 10px' }}>(헤더 시작 행)</span>
+                            </DataTitle>
                             <CommonInputEl type="number" name='rowStartNumber'
                                 value={props.excelTitleInfo?.rowStartNumber || ''}
                                 onChange={(e) => props.onChangeInputValue(e)}
