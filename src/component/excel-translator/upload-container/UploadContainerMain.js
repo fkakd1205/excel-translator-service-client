@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import queryString from 'query-string';
 import ExcelTranslatorCommonModal from "../../modal/CommonModal";
@@ -31,7 +31,6 @@ export default function UploadContainerMain(props) {
     const [createHeaderModalOpen, setCreateHeaderModalOpen] = useState(false);
     
     const [selectedHeader, setSelectedHeader] = useState(null);
-    const [uploadedExcelData, setUploadExcelData] = useState(null);
     const [headerDetails, setHeaderDetails] = useState([]);
 
     useEffect(() => {
@@ -52,20 +51,6 @@ export default function UploadContainerMain(props) {
 
         initHeaderTitleState();
     }, [query.headerId, props.excelTranslatorHeaderList]);
-
-    useEffect(() => {
-        if(!selectedHeader) {
-            return;
-        }
-        
-        if(!props.uploadedExcelData) {
-            return;
-        }
-
-        // 헤더 데이터를 제외한 데이터 설정
-        let data = props.uploadedExcelData?.filter((r, idx) => idx !== 0)
-        setUploadExcelData([...data])
-    }, [selectedHeader, props.uploadedExcelData]);
 
     const onCreateHeaderModalOpen = () => {
         if (!selectedHeader) {
@@ -91,6 +76,12 @@ export default function UploadContainerMain(props) {
 
     const handleUpdateUploadHeader = async (e) => {
         e.preventDefault();
+
+        if(selectedHeader.downloadHeaderDetail.details.length > 0) {
+            if(!window.confirm('업로드 양식을 변경하면 다운로드 양식은 초기화됩니다. 그래도 수정하시겠습니까?')) {
+                return
+            }
+        }
              
         // 헤더 순서 설정
         let uploadDetails = headerDetails.map((r, idx) => {
@@ -190,7 +181,7 @@ export default function UploadContainerMain(props) {
     return (
         <>
             <UploadContainerBody
-                uploadedExcelData={uploadedExcelData}
+                uploadedExcelData={props.uploadedExcelData}
                 selectedHeader={selectedHeader}
 
                 onCreateHeaderModalOpen={onCreateHeaderModalOpen}

@@ -10,22 +10,6 @@ import { dateToYYMMDD } from '../../handler/dateHandler';
 import { useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 
-class TranslatedData {
-    constructor() {
-        this.id = uuidv4();
-        this.translatedData = {
-            details: []
-        };
-    }
-
-    toJSON() {
-        return {
-            id: this.id,
-            translatedData: this.translatedData,
-        }
-    }
-}
-
 export default function ExcelTranslatorMain(props) {
     const location = useLocation();
     const query = queryString.parse(location.search);
@@ -55,6 +39,14 @@ export default function ExcelTranslatorMain(props) {
         let translator = excelTranslatorHeaderList.find(r => r.id === query.headerId);
         setSelectedTranslator(translator)
     }, [excelTranslatorHeaderList, query])
+
+    useEffect(() => {
+        if(!selectedTranslator) {
+            return
+        }
+
+        setUploadedExcelData(null);
+    }, [selectedTranslator])
 
     const __handleDataConnect = () => {
         return {
@@ -153,9 +145,7 @@ export default function ExcelTranslatorMain(props) {
     }
 
     const handleDownloadTranslatedExcelFile = async () => {
-        // TODO :: uploadedExcelData에 헤더 데이터 제거하기
-        let uploadedData = uploadedExcelData.slice(1);
-        await __handleDataConnect().downloadTranslatedExcelFile(uploadedData);
+        await __handleDataConnect().downloadTranslatedExcelFile(uploadedExcelData);
     }
 
     const handleUpdateUploadForm = async (uploadHeaderDetails) => {

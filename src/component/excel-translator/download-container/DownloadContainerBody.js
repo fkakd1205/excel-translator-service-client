@@ -17,7 +17,7 @@ export default function DownloadContainerBody(props) {
                             <tr>
                                 {props.selectedHeader?.downloadHeaderDetail.details.map((data, idx) => {
                                     return (
-                                        <HeaderTh key={'download_header_idx' + idx} className="fixed-header large-cell" scope="col">
+                                        <HeaderTh key={'download_header_idx' + idx} className="fixed-header" scope="col">
                                             <span>{idx + 1}. </span><span>{data.headerName}</span>
                                         </HeaderTh>
                                     )

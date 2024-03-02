@@ -9,5 +9,5 @@
 }
 
 body * {
-    font-family: 'NanumSquareNeo';
+    font-family: 'NanumSquareNeo' !important;
 }

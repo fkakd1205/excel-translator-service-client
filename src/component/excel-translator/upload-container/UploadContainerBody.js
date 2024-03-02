@@ -19,7 +19,7 @@ export default function UploadContainerBody(props) {
                             <tr>
                                 {props.selectedHeader?.uploadHeaderDetail?.details.map((data, idx) => {
                                     return (
-                                        <HeaderTh key={'upload_header_idx' + idx} className="fixed-header large-cell" scope="col">
+                                        <HeaderTh key={'upload_header_idx' + idx} className="fixed-header" scope="col">
                                             <span>{data.headerName}</span>
                                         </HeaderTh>
                                     )

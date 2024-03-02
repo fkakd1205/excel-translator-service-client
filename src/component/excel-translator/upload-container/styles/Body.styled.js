@@ -5,12 +5,12 @@ export const Container = styled.div`
 `;
 
 export const BoardTitle = styled.div`
-    font-size: large;
-    color: rgba(000, 102, 153, 0.9);
+    font-size: 18px;
+    color: #004364;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 0;
+    padding-bottom: 20px;
     
     @media only screen and (max-width:576px){
         font-size: 16px;
@@ -28,7 +28,7 @@ export const DataOptionBox = styled.span`
 
     & .upload-header-excel-download {
         background: #ffffff;
-        border: 1px solid #5b5b5b;
+        border: 1px solid #bcbbba;
         color: #5b5b5b;
 
         &:hover{
@@ -62,7 +62,8 @@ export const BoardContainer = styled.div`
     overflow: auto;
     border-radius: 5px;
     font-size: 14px;
-    box-shadow: 1px 1px 10px #a9b3d599;
+    border: 1px solid #bcbbba;
+    box-shadow: 1px 1px 5px #eee;
 
     .info-text {
         text-align: center;
@@ -71,9 +72,11 @@ export const BoardContainer = styled.div`
     }
 
     & .fixed-header {
+        color: #626262;
+        background: #fafafa;
         position: sticky;
+        border-bottom: 1px solid #bcbbba;
         top: -1px;
-        background: #d5dae9;
         z-index:10;
         padding: 2px;
         font-size: 16px;
@@ -81,14 +84,6 @@ export const BoardContainer = styled.div`
         @media only screen and (max-width:576px){
             font-size: 14px;
         }
-    }
-
-    & .large-cell {
-        width: 300px;
-    }
-
-    & .xlarge-cell {
-        width: 500px;
     }
 
     @media only screen and (max-width:576px){
@@ -99,8 +94,8 @@ export const BoardContainer = styled.div`
 export const HeaderTh = styled.th`
     vertical-align: middle !important;
     text-align: center;
-    width: 150px;
-    border-right: 1px solid #ffffff;
+    width: 300px;
+    border-right: 1px solid #bcbbba;
 
     :last-child {
         border-right: none;
@@ -114,7 +109,7 @@ export const BodyTr = styled.tr`
 export const BodyTd = styled.td`
     vertical-align: middle !important;
     text-align: center;
-    width: 150px;
+    width: 300px;
     border-right: 1px solid #a7a7a720;
 `;
 
@@ -125,7 +120,7 @@ export const HeaderFormControlBtn = styled.button`
     color: #5b5b5b;
     font-size: 1em;
     font-weight: 500;
-    border:1px solid #5b5b5b;
+    border:1px solid #bcbbba;
     border-radius: 20px;
     float: right;
     transition: 0.2s all;
