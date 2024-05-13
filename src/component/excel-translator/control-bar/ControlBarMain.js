@@ -294,13 +294,15 @@ export default function ControlBarMain(props) {
 
         await testDataConnect().downloadExcelFile(excelData)
             .then(res => {
-                const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['content-type'] }));
+                // 임시 URL 생성
+                const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['Content-Type'] }));
                 const link = document.createElement('a');
                 link.href = url;
-
                 link.setAttribute('download', `${fileName}.xlsx`);
                 document.body.appendChild(link);
                 link.click();
+                // URL을 메모리에서 제거
+                window.URL.revokeObjectURL(url);
             })
             .catch(err => {
                 console.log(err);
