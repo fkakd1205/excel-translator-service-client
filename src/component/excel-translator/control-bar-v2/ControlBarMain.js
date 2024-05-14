@@ -7,6 +7,7 @@ import { createSearchParams, useLocation, useNavigate } from "react-router-dom";
 import { excelTranslatorDataConnect } from "../../../data-connect/excelTranslatorDataConnect";
 import CreateTranslatorModal from "./modal/CreateTranslatorModal";
 import ModifyTranslatorModal from "./modal/ModifyTranslatorModal";
+import testDataConnect from "../../../data-connect/testDataConnect";
 
 class ExcelTranslatorHeader {
     constructor() {
@@ -51,7 +52,7 @@ const excelTitleInfoReducer = (state, action) => {
     }
 }
 
-export default function ControlBarMain(props) {
+export default function ControlBarMainV2(props) {
     const location = useLocation();
     const navigate = useNavigate();
     const query = queryString.parse(location.search)
@@ -60,6 +61,9 @@ export default function ControlBarMain(props) {
     const [selectedHeader, setSelectedHeader] = useState(null);
     const [createHeaderModalOpen, setCreateHeaderModalOpen] = useState(false);
     const [modifyHeaderModalOpen, setModifyHeaderModalOpen] = useState(false);
+
+    // test
+    const [excelData, setExcelData] = useState(null);
 
     useEffect(() => {
         function initSelectedHeader() {
@@ -260,6 +264,51 @@ export default function ControlBarMain(props) {
         await props.handleUploadExcelData(uploadedFormData);
     }
 
+    const handleTestUpload = async (e) => {
+        e.preventDefault();
+
+        // 파일을 선택하지 않은 경우
+        if (e.target.files.length === 0) return;
+
+        let addFiles = e.target.files;
+
+        var uploadedFormData = new FormData();
+        uploadedFormData.append('file', addFiles[0]);
+
+        await testDataConnect().uploadFile(uploadedFormData)
+            .then(res => {
+                if (res.status === 200) {
+                    setExcelData(res?.data?.data);
+                }
+            })
+            .catch(err => {
+                let res = err.response;
+                alert(res?.data?.message);
+            })
+    }
+
+    const handleTestDownload = async (e) => {
+        e.preventDefault();
+        
+        let fileName = 'chaego_excel'
+
+        await testDataConnect().downloadExcelFile(excelData)
+            .then(res => {
+                // 임시 URL 생성
+                const url = window.URL.createObjectURL(new Blob([res.data], { type: res.headers['Content-Type'] }));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `${fileName}.xlsx`);
+                document.body.appendChild(link);
+                link.click();
+                // URL을 메모리에서 제거
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
     const handleDownloadTranslatedFile = async (e) => {
         e.preventDefault();
 
@@ -319,7 +368,19 @@ export default function ControlBarMain(props) {
     }
 
     return (
-        <>
+        <>  
+            <div style={{display: 'flex', marginBottom: '20px'}}>
+                <input
+                    id="upload-file-test"
+                    type="file"
+                    accept=".xls,.xlsx"
+                    onClick={(e) => e.target.value = ''}
+                    onChange={(e) => handleTestUpload(e)}
+                />
+                <div className='button-box' onClick={(e) => handleTestDownload(e)}>
+                    <button>download</button>
+                </div>
+            </div>
             <ControlBarBody
                 excelTranslatorHeaderList={props.excelTranslatorHeaderList}
                 selectedHeader={selectedHeader}

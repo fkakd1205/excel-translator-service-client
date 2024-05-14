@@ -9,6 +9,7 @@ import DownloadContainerMain from './download-container/DownloadContainerMain';
 import { dateToYYMMDD } from '../../handler/dateHandler';
 import { useLocation } from 'react-router-dom';
 import queryString from 'query-string';
+import ControlBarMainV2 from './control-bar-v2/ControlBarMain';
 
 export default function ExcelTranslatorMain(props) {
     const location = useLocation();
@@ -173,7 +174,18 @@ export default function ExcelTranslatorMain(props) {
         <>
             <Container>
                 {/* 엑셀 변환기 컨트롤 바 */}
-                <ControlBarMain
+                {/* <ControlBarMain
+                    excelTranslatorHeaderList={excelTranslatorHeaderList}
+                    uploadedExcelData={uploadedExcelData}
+
+                    handleUploadExcelData={handleUploadExcelData}
+                    handleDownloadTranslatedExcelFile={handleDownloadTranslatedExcelFile}
+
+                    __searchTranslatorHeaderList={__handleDataConnect().searchExcelTranslatorHeader}
+                /> */}
+
+                {/* 엑셀 변환기 컨트롤 바 V2 - included Poi Test */}
+                <ControlBarMainV2
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
                     uploadedExcelData={uploadedExcelData}
 
