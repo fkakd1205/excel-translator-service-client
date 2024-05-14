@@ -174,18 +174,7 @@ export default function ExcelTranslatorMain(props) {
         <>
             <Container>
                 {/* 엑셀 변환기 컨트롤 바 */}
-                {/* <ControlBarMain
-                    excelTranslatorHeaderList={excelTranslatorHeaderList}
-                    uploadedExcelData={uploadedExcelData}
-
-                    handleUploadExcelData={handleUploadExcelData}
-                    handleDownloadTranslatedExcelFile={handleDownloadTranslatedExcelFile}
-
-                    __searchTranslatorHeaderList={__handleDataConnect().searchExcelTranslatorHeader}
-                /> */}
-
-                {/* 엑셀 변환기 컨트롤 바 V2 - included Poi Test */}
-                <ControlBarMainV2
+                <ControlBarMain
                     excelTranslatorHeaderList={excelTranslatorHeaderList}
                     uploadedExcelData={uploadedExcelData}
 
@@ -194,6 +183,17 @@ export default function ExcelTranslatorMain(props) {
 
                     __searchTranslatorHeaderList={__handleDataConnect().searchExcelTranslatorHeader}
                 />
+
+                {/* 엑셀 변환기 컨트롤 바 V2 - included Poi Test */}
+                {/* <ControlBarMainV2
+                    excelTranslatorHeaderList={excelTranslatorHeaderList}
+                    uploadedExcelData={uploadedExcelData}
+
+                    handleUploadExcelData={handleUploadExcelData}
+                    handleDownloadTranslatedExcelFile={handleDownloadTranslatedExcelFile}
+
+                    __searchTranslatorHeaderList={__handleDataConnect().searchExcelTranslatorHeader}
+                /> */}
 
                 {/* 업로드 헤더 및 데이터 보드 */}
                 <UploadContainerMain
